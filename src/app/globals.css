@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #111827;
+  --color-foreground: #f9fafb;
+  --color-accent: #10b981;
+  --color-accent-hover: #059669;
+  --color-card: #1e293b;
+  --color-card-hover: #263548;
+  --color-secondary: #1f2937;
+  --color-border: #374151;
+  --color-muted: #6b7280;
+  --color-text-secondary: #9ca3af;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse-live {
+  animation: pulse-live 1.5s ease-in-out infinite;
+}
