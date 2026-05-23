@@ -6,7 +6,7 @@ import { useLocale, type Locale } from '@/components/LocaleProvider';
 import { qualifiesForAward } from '@/lib/awardEngine';
 
 type CouponRule = 'participate' | 'winner' | 'exact' | 'goal_diff' | 'home_goals' | 'away_goals' | 'first_half_goals';
-type Tab = 'matches' | 'predictions' | 'vouchers' | 'promos';
+type Tab = 'matches' | 'bracket' | 'predictions' | 'vouchers' | 'promos';
 type FixtureView = 'date' | 'group' | 'team' | 'city' | 'venue' | 'phase';
 
 type Match = {
@@ -24,6 +24,7 @@ type Match = {
   awayFlag: string;
   homeScore: number | null;
   awayScore: number | null;
+  status?: string;
 };
 
 type Fan = {
@@ -100,6 +101,7 @@ const text: Record<Locale, Record<string, string>> = {
     title: 'Predict, win vouchers, show your QR.',
     body: 'Join with almost no friction: choose a match, save your score, and claim local rewards if you hit.',
     matches: 'Matches',
+    bracket: 'Bracket',
     predictions: 'My predictions',
     vouchers: 'My vouchers',
     promos: 'Promos',
@@ -124,6 +126,8 @@ const text: Record<Locale, Record<string, string>> = {
     fallbackTime: 'Standard time',
     venue: 'Venue',
     phase: 'Phase',
+    bracketHelper: 'Knockout path from Round of 32 to the final. Slots fill as real qualifiers are resolved.',
+    thirdPlace: 'Third place',
     fixtureView: 'View by',
     filter: 'Search team, city, group or stadium',
     date: 'Date',
@@ -136,6 +140,7 @@ const text: Record<Locale, Record<string, string>> = {
     title: 'Pronostica, gana vales y muestra tu QR.',
     body: 'Participa sin friccion: elige partido, guarda marcador y reclama premios locales si aciertas.',
     matches: 'Partidos',
+    bracket: 'Llaves',
     predictions: 'Mis predicciones',
     vouchers: 'Mis vales',
     promos: 'Promos',
@@ -160,6 +165,8 @@ const text: Record<Locale, Record<string, string>> = {
     fallbackTime: 'Horario estandar',
     venue: 'Estadio',
     phase: 'Fase',
+    bracketHelper: 'Camino eliminatorio desde dieciseisavos hasta la final. Los cruces se llenan con clasificados reales.',
+    thirdPlace: 'Tercer puesto',
     fixtureView: 'Ver por',
     filter: 'Buscar equipo, ciudad, grupo o estadio',
     date: 'Fecha',
@@ -172,6 +179,7 @@ const text: Record<Locale, Record<string, string>> = {
     title: 'Dê seu palpite, ganhe cupons e mostre seu QR.',
     body: 'Participe sem fricção: escolha o jogo, salve o placar e resgate prêmios locais se acertar.',
     matches: 'Jogos',
+    bracket: 'Chaves',
     predictions: 'Minhas apostas',
     vouchers: 'Meus cupons',
     promos: 'Promoções',
@@ -196,6 +204,8 @@ const text: Record<Locale, Record<string, string>> = {
     fallbackTime: 'Horario padrao',
     venue: 'Estadio',
     phase: 'Fase',
+    bracketHelper: 'Caminho eliminatorio da fase de 32 ate a final. As vagas se completam com classificados reais.',
+    thirdPlace: 'Terceiro lugar',
     fixtureView: 'Ver por',
     filter: 'Buscar time, cidade, grupo ou estadio',
     date: 'Data',
@@ -208,6 +218,7 @@ const text: Record<Locale, Record<string, string>> = {
     title: 'Pronostiquez, gagnez des coupons et montrez votre QR.',
     body: 'Participez sans friction: choisissez un match, enregistrez le score et réclamez des prix locaux si vous gagnez.',
     matches: 'Matchs',
+    bracket: 'Tableau',
     predictions: 'Mes pronostics',
     vouchers: 'Mes coupons',
     promos: 'Promos',
@@ -232,6 +243,8 @@ const text: Record<Locale, Record<string, string>> = {
     fallbackTime: 'Heure standard',
     venue: 'Stade',
     phase: 'Phase',
+    bracketHelper: 'Parcours eliminatoire du Round of 32 a la finale. Les places se remplissent avec les qualifies reels.',
+    thirdPlace: 'Troisieme place',
     fixtureView: 'Voir par',
     filter: 'Chercher equipe, ville, groupe ou stade',
     date: 'Date',
@@ -381,6 +394,21 @@ function matchesFixtureDetail(match: Match, view: FixtureView, rawSearch: string
   return normalizeSearch(viewSpecificSearchText(match, view, locale)).includes(search);
 }
 
+function matchWinner(match: Match) {
+  if (match.homeScore === null || match.awayScore === null) return null;
+  if (match.homeScore === match.awayScore) return 'TBD';
+  return match.homeScore > match.awayScore ? match.homeFlag : match.awayFlag;
+}
+
+function matchStatusLabel(match: Match) {
+  if (match.homeScore === null || match.awayScore === null) return match.status === 'scheduled' || !match.status ? 'TBD' : match.status;
+  return `${match.homeScore}-${match.awayScore}`;
+}
+
+function knockoutMatches(matches: Match[], from: number, to: number) {
+  return matches.filter((match) => match.id >= from && match.id <= to).sort((a, b) => a.id - b.id);
+}
+
 function wins(prediction: Prediction, match: Match, coupon: Coupon) {
   return qualifiesForAward(prediction, match, coupon.rule);
 }
@@ -415,6 +443,7 @@ function mapMatch(row: Record<string, unknown>): Match {
     awayFlag: String(row.away_code || '').slice(0, 3),
     homeScore: row.home_score === null ? null : Number(row.home_score),
     awayScore: row.away_score === null ? null : Number(row.away_score),
+    status: String(row.status || 'scheduled'),
   };
 }
 
@@ -632,8 +661,8 @@ export default function HomePage() {
       </section>
 
       <main className="mx-auto max-w-7xl px-4 py-8">
-        <div className="mb-6 grid grid-cols-2 gap-2 rounded-lg border border-white/10 bg-white/10 p-2 md:grid-cols-4">
-          {(['matches', 'predictions', 'vouchers', 'promos'] as Tab[]).map((item) => (
+        <div className="mb-6 grid grid-cols-2 gap-2 rounded-lg border border-white/10 bg-white/10 p-2 md:grid-cols-5">
+          {(['matches', 'bracket', 'predictions', 'vouchers', 'promos'] as Tab[]).map((item) => (
             <button
               key={item}
               onClick={() => setTab(item)}
@@ -721,6 +750,16 @@ export default function HomePage() {
               savePrediction={savePrediction}
             />
           </section>
+        )}
+
+        {tab === 'bracket' && (
+          <KnockoutBracket
+            matches={matches}
+            selectedMatchId={selectedMatchId}
+            setSelectedMatchId={setSelectedMatchId}
+            locale={locale}
+            t={t}
+          />
         )}
 
         {tab === 'predictions' && (
@@ -876,6 +915,124 @@ function MatchHero({ match, locale, t }: { match: Match; locale: Locale; t: Reco
           <Team name={match.away} code={match.awayFlag} align="right" />
         </div>
       </div>
+    </div>
+  );
+}
+
+function KnockoutBracket({
+  matches,
+  selectedMatchId,
+  setSelectedMatchId,
+  locale,
+  t,
+}: {
+  matches: Match[];
+  selectedMatchId: number;
+  setSelectedMatchId: (id: number) => void;
+  locale: Locale;
+  t: Record<string, string>;
+}) {
+  const round32 = knockoutMatches(matches, 73, 88);
+  const r16 = knockoutMatches(matches, 89, 96);
+  const qf = knockoutMatches(matches, 97, 100);
+  const sf = knockoutMatches(matches, 101, 102);
+  const bronze = matches.find((match) => match.id === 103);
+  const final = matches.find((match) => match.id === 104);
+
+  return (
+    <section className="glass-panel rounded-lg p-5">
+      <SectionTitle title={t.bracket} helper={t.bracketHelper} />
+      <div className="mt-6 overflow-x-auto pb-3">
+        <div className="grid min-w-[1180px] grid-cols-[1.1fr_1fr_0.95fr_0.9fr_1.1fr_0.9fr_0.95fr_1fr_1.1fr] gap-3">
+          <BracketColumn title="Round of 32" matches={round32.slice(0, 8)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} />
+          <BracketColumn title="Round of 16" matches={r16.slice(0, 4)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced />
+          <BracketColumn title="Quarter-finals" matches={qf.slice(0, 2)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced />
+          <BracketColumn title="Semi-finals" matches={sf.slice(0, 1)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} center />
+          <div className="grid content-center gap-4">
+            <p className="text-center text-xs font-black uppercase tracking-[0.2em] text-amber-300">Final</p>
+            {final && <BracketMatch match={final} selected={selectedMatchId === final.id} setSelectedMatchId={setSelectedMatchId} locale={locale} featured />}
+            {bronze && (
+              <div>
+                <p className="mb-2 text-center text-xs font-black uppercase tracking-[0.2em] text-slate-400">{t.thirdPlace}</p>
+                <BracketMatch match={bronze} selected={selectedMatchId === bronze.id} setSelectedMatchId={setSelectedMatchId} locale={locale} />
+              </div>
+            )}
+          </div>
+          <BracketColumn title="Semi-finals" matches={sf.slice(1, 2)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} center />
+          <BracketColumn title="Quarter-finals" matches={qf.slice(2, 4)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced />
+          <BracketColumn title="Round of 16" matches={r16.slice(4, 8)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced />
+          <BracketColumn title="Round of 32" matches={round32.slice(8, 16)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BracketColumn({
+  title,
+  matches,
+  selectedMatchId,
+  setSelectedMatchId,
+  locale,
+  spaced = false,
+  center = false,
+}: {
+  title: string;
+  matches: Match[];
+  selectedMatchId: number;
+  setSelectedMatchId: (id: number) => void;
+  locale: Locale;
+  spaced?: boolean;
+  center?: boolean;
+}) {
+  return (
+    <div className={`grid gap-3 ${spaced ? 'content-around' : 'content-start'} ${center ? 'content-center' : ''}`}>
+      <p className="text-center text-xs font-black uppercase tracking-[0.2em] text-amber-300">{title}</p>
+      {matches.map((match) => (
+        <BracketMatch key={match.id} match={match} selected={selectedMatchId === match.id} setSelectedMatchId={setSelectedMatchId} locale={locale} />
+      ))}
+    </div>
+  );
+}
+
+function BracketMatch({
+  match,
+  selected,
+  setSelectedMatchId,
+  locale,
+  featured = false,
+}: {
+  match: Match;
+  selected: boolean;
+  setSelectedMatchId: (id: number) => void;
+  locale: Locale;
+  featured?: boolean;
+}) {
+  const schedule = formatMatchSchedule(match, locale);
+  const winner = matchWinner(match);
+  return (
+    <button
+      type="button"
+      onClick={() => setSelectedMatchId(match.id)}
+      className={`fixture-card w-full rounded-lg border p-3 text-left transition ${selected ? 'border-amber-300' : 'border-white/10 hover:border-amber-300/60'} ${featured ? 'bg-amber-300/10' : ''}`}
+    >
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="text-xs font-black text-slate-400">M{match.id}</span>
+        <span className="rounded bg-white/10 px-2 py-1 text-[11px] font-black uppercase text-slate-300">{matchStatusLabel(match)}</span>
+      </div>
+      <BracketTeam code={match.homeFlag} name={match.home} score={match.homeScore} winner={winner === match.homeFlag} />
+      <BracketTeam code={match.awayFlag} name={match.away} score={match.awayScore} winner={winner === match.awayFlag} />
+      <p className="mt-2 text-[11px] uppercase tracking-[0.12em] text-slate-500">{schedule.local} · {match.city}</p>
+    </button>
+  );
+}
+
+function BracketTeam({ code, name, score, winner }: { code: string; name: string; score: number | null; winner: boolean }) {
+  return (
+    <div className={`mt-1 grid grid-cols-[42px_1fr_auto] items-center gap-2 rounded-md px-2 py-1 ${winner ? 'bg-emerald-300/20 text-white' : 'bg-white/5 text-slate-300'}`}>
+      <span className="text-xs font-black">{code}</span>
+      <span className="truncate text-sm font-bold">{name}</span>
+      <span className="text-sm font-black tabular-nums">{score ?? '-'}</span>
     </div>
   );
 }
