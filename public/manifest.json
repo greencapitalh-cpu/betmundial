@@ -1,0 +1,19 @@
+{
+  "name": "GolazoPromo",
+  "short_name": "GolazoPromo",
+  "description": "World fantasy bet app with coupons and local promotions.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#050914",
+  "theme_color": "#f7c948",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

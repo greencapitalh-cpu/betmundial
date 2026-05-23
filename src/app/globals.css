@@ -16,9 +16,123 @@
 }
 
 body {
-  background: var(--color-background);
+  background: #050914;
   color: var(--color-foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+.world-hero-bg {
+  background-image:
+    linear-gradient(90deg, rgba(5, 9, 20, 0.98) 0%, rgba(5, 9, 20, 0.8) 42%, rgba(5, 9, 20, 0.22) 100%),
+    linear-gradient(180deg, rgba(5, 9, 20, 0.05), rgba(5, 9, 20, 0.95)),
+    url('/world-cup-abstract-bg.png');
+  background-position: center;
+  background-size: cover;
+}
+
+.stadium-surface {
+  background:
+    radial-gradient(circle at 18% 10%, rgba(255, 196, 77, 0.17), transparent 30%),
+    radial-gradient(circle at 86% 22%, rgba(0, 229, 160, 0.14), transparent 30%),
+    linear-gradient(135deg, #050914 0%, #081832 42%, #2a0d30 100%);
+}
+
+.glass-panel {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(145deg, rgba(9, 20, 44, 0.88), rgba(16, 24, 46, 0.7));
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(18px);
+}
+
+.pitch-card {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.18), transparent 18%),
+    linear-gradient(135deg, #0d8f63 0%, #056246 100%);
+  background-size: 38px 38px, 38px 38px, auto, auto;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.2), 0 20px 44px rgba(0, 220, 150, 0.14);
+}
+
+.trophy-silhouette {
+  position: absolute;
+  right: clamp(1rem, 7vw, 7rem);
+  bottom: -18px;
+  width: min(32vw, 330px);
+  height: min(48vw, 500px);
+  opacity: 0.78;
+  filter: drop-shadow(0 34px 65px rgba(247, 201, 72, 0.22));
+  pointer-events: none;
+}
+
+.trophy-silhouette::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.78), transparent 9%),
+    linear-gradient(135deg, #fff1a8, #f7c948 35%, #ff8a3d 67%, #00e5a0);
+  clip-path: polygon(34% 5%, 66% 5%, 73% 24%, 68% 43%, 58% 54%, 56% 73%, 70% 82%, 78% 94%, 22% 94%, 30% 82%, 44% 73%, 42% 54%, 32% 43%, 27% 24%);
+}
+
+.trophy-silhouette::after {
+  content: "";
+  position: absolute;
+  inset: 21% 0 auto 0;
+  height: 30%;
+  border: 16px solid rgba(247, 201, 72, 0.82);
+  border-left-color: transparent;
+  border-right-color: transparent;
+  border-radius: 42% 42% 50% 50%;
+}
+
+.fan-card {
+  background:
+    linear-gradient(135deg, rgba(0, 229, 160, 0.12), rgba(247, 201, 72, 0.08)),
+    #07142a;
+}
+
+.promo-ticket {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03)),
+    radial-gradient(circle at 0% 50%, rgba(255, 196, 77, 0.34), transparent 20%),
+    radial-gradient(circle at 100% 0%, rgba(255, 61, 113, 0.32), transparent 26%),
+    #0b1430;
+}
+
+.promo-ticket::before,
+.promo-ticket::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #07111f;
+  transform: translateY(-50%);
+}
+
+.promo-ticket::before { left: -12px; }
+.promo-ticket::after { right: -12px; }
+
+.fixture-card {
+  background:
+    linear-gradient(135deg, rgba(0, 229, 160, 0.1), rgba(255, 255, 255, 0.03)),
+    #09162f;
+}
+
+.fantasy-button {
+  background: linear-gradient(135deg, #f7c948, #ff5f6d 55%, #00e5a0);
+  color: #050914;
+  box-shadow: 0 14px 30px rgba(255, 95, 109, 0.2);
+}
+
+.fantasy-button:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
 }
 
 @keyframes pulse-live {
@@ -28,4 +142,28 @@ body {
 
 .animate-pulse-live {
   animation: pulse-live 1.5s ease-in-out infinite;
+}
+
+@keyframes sponsor-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.sponsor-marquee {
+  mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+}
+
+.sponsor-marquee:hover .sponsor-item {
+  animation-play-state: paused;
+}
+
+.sponsor-item {
+  animation: sponsor-scroll 28s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse-live,
+  .sponsor-item {
+    animation: none;
+  }
 }
