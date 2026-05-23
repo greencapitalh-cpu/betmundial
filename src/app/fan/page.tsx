@@ -7,7 +7,7 @@ import { qualifiesForAward } from '@/lib/awardEngine';
 
 type CouponRule = 'participate' | 'winner' | 'exact' | 'goal_diff' | 'home_goals' | 'away_goals' | 'first_half_goals';
 type Tab = 'matches' | 'predictions' | 'vouchers' | 'promos';
-type FixtureView = 'date' | 'group' | 'team' | 'city' | 'venue';
+type FixtureView = 'date' | 'group' | 'team' | 'city' | 'venue' | 'phase';
 
 type Match = {
   id: number;
@@ -123,6 +123,7 @@ const text: Record<Locale, Record<string, string>> = {
     stadiumTime: 'Stadium time',
     fallbackTime: 'Standard time',
     venue: 'Venue',
+    phase: 'Phase',
     fixtureView: 'View by',
     filter: 'Search team, city, group or stadium',
     date: 'Date',
@@ -158,6 +159,7 @@ const text: Record<Locale, Record<string, string>> = {
     stadiumTime: 'Horario estadio',
     fallbackTime: 'Horario estandar',
     venue: 'Estadio',
+    phase: 'Fase',
     fixtureView: 'Ver por',
     filter: 'Buscar equipo, ciudad, grupo o estadio',
     date: 'Fecha',
@@ -193,6 +195,7 @@ const text: Record<Locale, Record<string, string>> = {
     stadiumTime: 'Horario do estadio',
     fallbackTime: 'Horario padrao',
     venue: 'Estadio',
+    phase: 'Fase',
     fixtureView: 'Ver por',
     filter: 'Buscar time, cidade, grupo ou estadio',
     date: 'Data',
@@ -228,6 +231,7 @@ const text: Record<Locale, Record<string, string>> = {
     stadiumTime: 'Heure du stade',
     fallbackTime: 'Heure standard',
     venue: 'Stade',
+    phase: 'Phase',
     fixtureView: 'Voir par',
     filter: 'Chercher equipe, ville, groupe ou stade',
     date: 'Date',
@@ -289,12 +293,43 @@ function fixtureKey(match: Match, view: FixtureView, locale: Locale) {
   if (view === 'group') return match.group;
   if (view === 'team') return `${match.homeFlag} / ${match.awayFlag}`;
   if (view === 'city') return match.city;
+  if (view === 'phase') return match.group;
   return match.venue;
+}
+
+function normalizeSearch(value: string) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9/ ]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+function groupLetterFromMatch(match: Match) {
+  const found = normalizeSearch(match.group).match(/\b(?:group|grupo|groupe)\s+([a-l])\b/);
+  return found?.[1] || '';
+}
+
+function phaseAliases(phase: string) {
+  const value = normalizeSearch(phase);
+  const aliases = [value];
+  if (value.includes('grupos') || value.includes('group')) aliases.push('groups', 'group stage', 'fase grupos', 'fase de grupos', 'grupos');
+  if (value.includes('round of 32')) aliases.push('round 32', 'r32', 'dieciseisavos', 'fase 32');
+  if (value.includes('round of 16')) aliases.push('round 16', 'r16', 'octavos', 'octavos de final');
+  if (value.includes('quarter')) aliases.push('quarter finals', 'quarterfinals', 'cuartos', 'cuartos de final');
+  if (value.includes('semi')) aliases.push('semis', 'semifinals', 'semifinal', 'semifinales');
+  if (value.includes('bronze')) aliases.push('third place', 'tercer puesto', 'bronce');
+  if (value.includes('final')) aliases.push('final');
+  return aliases;
 }
 
 function matchSearchText(match: Match) {
   return [
     match.group,
+    match.group.replace(/^Grupo/i, 'Group'),
+    match.group.replace(/^Group/i, 'Grupo'),
     match.date,
     match.time,
     match.city,
@@ -303,7 +338,47 @@ function matchSearchText(match: Match) {
     match.away,
     match.homeFlag,
     match.awayFlag,
-  ].join(' ').toLowerCase();
+    ...phaseAliases(match.group),
+  ].join(' ');
+}
+
+function matchesFixtureSearch(match: Match, rawSearch: string) {
+  const search = normalizeSearch(rawSearch);
+  if (!search) return true;
+  const groupLetter = groupLetterFromMatch(match);
+  const groupQuery = search.match(/^(?:group|grupo|groupe)\s+([a-l])$/);
+  if (groupQuery) return groupLetter === groupQuery[1];
+  if (/^[a-l]$/.test(search)) return groupLetter === search;
+  const tokens = search.split(' ').filter(Boolean);
+  if (tokens.includes('group') || tokens.includes('grupo') || tokens.includes('groupe')) {
+    const letter = tokens.find((token) => /^[a-l]$/.test(token));
+    if (letter) return groupLetter === letter;
+  }
+  const text = normalizeSearch(matchSearchText(match));
+  return tokens.every((token) => text.includes(token));
+}
+
+function viewSpecificSearchText(match: Match, view: FixtureView, locale: Locale) {
+  if (view === 'date') return `${match.date} ${match.time} ${formatMatchSchedule(match, locale).local}`;
+  if (view === 'group') return `${match.group} ${groupLetterFromMatch(match)} group ${groupLetterFromMatch(match)} grupo ${groupLetterFromMatch(match)}`;
+  if (view === 'team') return `${match.home} ${match.away} ${match.homeFlag} ${match.awayFlag}`;
+  if (view === 'city') return match.city;
+  if (view === 'venue') return match.venue;
+  return phaseAliases(match.group).join(' ');
+}
+
+function matchesFixtureDetail(match: Match, view: FixtureView, rawSearch: string, locale: Locale) {
+  const search = normalizeSearch(rawSearch);
+  if (!search) return true;
+  if (view === 'group') {
+    const letter = groupLetterFromMatch(match);
+    const groupQuery = search.match(/^(?:group|grupo|groupe)?\s*([a-l])$/);
+    return groupQuery ? letter === groupQuery[1] : normalizeSearch(match.group).includes(search);
+  }
+  if (view === 'phase') {
+    return phaseAliases(match.group).some((alias) => normalizeSearch(alias).includes(search) || search.includes(normalizeSearch(alias)));
+  }
+  return normalizeSearch(viewSpecificSearchText(match, view, locale)).includes(search);
 }
 
 function wins(prediction: Prediction, match: Match, coupon: Coupon) {
@@ -437,9 +512,8 @@ export default function HomePage() {
   const selectedMatch = matches.find((match) => match.id === selectedMatchId) ?? matches[0];
   const myPredictions = activeFan ? predictions.filter((prediction) => prediction.userId === activeFan.id) : [];
   const filteredMatches = useMemo(() => {
-    const search = fixtureFilter.trim().toLowerCase();
-    return matches.filter((match) => !search || matchSearchText(match).includes(search));
-  }, [fixtureFilter, matches]);
+    return matches.filter((match) => matchesFixtureDetail(match, fixtureView, fixtureFilter, locale));
+  }, [fixtureFilter, fixtureView, locale, matches]);
   const fixtureGroups = useMemo(() => {
     const groups = new Map<string, Match[]>();
     filteredMatches.forEach((match) => {
@@ -588,6 +662,7 @@ export default function HomePage() {
                     <option value="team">{t.team}</option>
                     <option value="city">{t.city}</option>
                     <option value="venue">{t.venue}</option>
+                    <option value="phase">{t.phase}</option>
                   </select>
                 </label>
                 <label className="grid gap-2 text-sm font-semibold text-slate-300">
