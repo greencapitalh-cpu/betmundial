@@ -196,7 +196,7 @@ export default function MerchantVerifyPage() {
   return (
     <div className="stadium-surface min-h-screen px-4 py-10 text-white">
       <div className="mx-auto grid max-w-7xl gap-6">
-        <section className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+        <section id="rewards" className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <div className="glass-panel rounded-lg p-5">
             <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Local rewards</p>
             <h1 className="mt-1 text-3xl font-black">Premios que entrega el local</h1>
@@ -253,7 +253,7 @@ export default function MerchantVerifyPage() {
           </div>
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+        <section id="ads" className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <div className="glass-panel rounded-lg p-5">
             <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Visit promos</p>
             <h2 className="mt-1 text-3xl font-black">Promos abiertas por visitar</h2>
@@ -290,7 +290,7 @@ export default function MerchantVerifyPage() {
           </div>
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+        <section id="verify" className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
         <section className="glass-panel rounded-lg p-5">
           <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Local verifier</p>
           <h1 className="mt-1 text-3xl font-black">Validate a voucher</h1>

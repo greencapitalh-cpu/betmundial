@@ -7,6 +7,7 @@ import { qualifiesForAward } from '@/lib/awardEngine';
 
 type CouponRule = 'participate' | 'winner' | 'exact' | 'goal_diff' | 'home_goals' | 'away_goals' | 'first_half_goals';
 type Tab = 'matches' | 'predictions' | 'vouchers' | 'promos';
+type FixtureView = 'date' | 'group' | 'team' | 'city' | 'venue';
 
 type Match = {
   id: number;
@@ -74,23 +75,17 @@ type Voucher = {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bet2back-production.up.railway.app';
 
 const matchesSeed: Match[] = [
-  { id: 1, group: 'Grupo A', date: '11 Jun', time: '20:00', kickoffUtc: '2026-06-12T01:00:00Z', timezone: 'America/Mexico_City', city: 'Ciudad de Mexico', venue: 'Azteca', home: 'Mexico', away: 'South Africa', homeFlag: 'MEX', awayFlag: 'RSA', homeScore: 2, awayScore: 1 },
-  { id: 2, group: 'Grupo A', date: '11 Jun', time: '23:00', kickoffUtc: '2026-06-12T04:00:00Z', timezone: 'America/Mexico_City', city: 'Guadalajara', venue: 'Akron', home: 'South Korea', away: 'Czechia', homeFlag: 'KOR', awayFlag: 'CZE', homeScore: null, awayScore: null },
-  { id: 3, group: 'Grupo B', date: '12 Jun', time: '20:00', kickoffUtc: '2026-06-13T00:00:00Z', timezone: 'America/Toronto', city: 'Toronto', venue: 'BMO Field', home: 'Canada', away: 'Switzerland', homeFlag: 'CAN', awayFlag: 'SUI', homeScore: null, awayScore: null },
-  { id: 4, group: 'Grupo C', date: '13 Jun', time: '21:00', kickoffUtc: '2026-06-14T01:00:00Z', timezone: 'America/New_York', city: 'Miami', venue: 'Hard Rock', home: 'Brazil', away: 'Morocco', homeFlag: 'BRA', awayFlag: 'MAR', homeScore: 1, awayScore: 1 },
-  { id: 5, group: 'Grupo D', date: '13 Jun', time: '20:00', kickoffUtc: '2026-06-14T03:00:00Z', timezone: 'America/Los_Angeles', city: 'Los Angeles', venue: 'SoFi', home: 'United States', away: 'Paraguay', homeFlag: 'USA', awayFlag: 'PAR', homeScore: null, awayScore: null },
-  { id: 6, group: 'Grupo J', date: '16 Jun', time: '20:00', kickoffUtc: '2026-06-17T01:00:00Z', timezone: 'America/Chicago', city: 'Kansas City', venue: 'Arrowhead', home: 'Argentina', away: 'Algeria', homeFlag: 'ARG', awayFlag: 'ALG', homeScore: 3, awayScore: 1 },
+  { id: 1, group: 'Grupo A', date: '11 Jun', time: '13:00', kickoffUtc: '2026-06-11T19:00:00Z', timezone: 'America/Mexico_City', city: 'Mexico City', venue: 'Mexico City Stadium', home: 'Mexico', away: 'South Africa', homeFlag: 'MEX', awayFlag: 'RSA', homeScore: null, awayScore: null },
+  { id: 2, group: 'Grupo A', date: '11 Jun', time: '20:00', kickoffUtc: '2026-06-12T02:00:00Z', timezone: 'America/Mexico_City', city: 'Guadalajara', venue: 'Guadalajara Stadium', home: 'Korea Republic', away: 'Czechia', homeFlag: 'KOR', awayFlag: 'CZE', homeScore: null, awayScore: null },
+  { id: 3, group: 'Grupo B', date: '12 Jun', time: '15:00', kickoffUtc: '2026-06-12T19:00:00Z', timezone: 'America/Toronto', city: 'Toronto', venue: 'Toronto Stadium', home: 'Canada', away: 'Bosnia & Herzegovina', homeFlag: 'CAN', awayFlag: 'BIH', homeScore: null, awayScore: null },
+  { id: 4, group: 'Grupo D', date: '12 Jun', time: '18:00', kickoffUtc: '2026-06-13T01:00:00Z', timezone: 'America/Los_Angeles', city: 'Los Angeles', venue: 'Los Angeles Stadium', home: 'United States', away: 'Paraguay', homeFlag: 'USA', awayFlag: 'PAR', homeScore: null, awayScore: null },
+  { id: 5, group: 'Grupo C', date: '13 Jun', time: '18:00', kickoffUtc: '2026-06-13T22:00:00Z', timezone: 'America/New_York', city: 'New York New Jersey', venue: 'New York New Jersey Stadium', home: 'Brazil', away: 'Morocco', homeFlag: 'BRA', awayFlag: 'MAR', homeScore: null, awayScore: null },
+  { id: 6, group: 'Grupo J', date: '16 Jun', time: '21:00', kickoffUtc: '2026-06-17T01:00:00Z', timezone: 'America/New_York', city: 'Miami', venue: 'Miami Stadium', home: 'Argentina', away: 'Algeria', homeFlag: 'ARG', awayFlag: 'ALG', homeScore: null, awayScore: null },
 ];
 
-const fansSeed: Fan[] = [
-  { id: 1, name: 'Ana Torres', handle: 'ANA-204', contact: '+5215512340001', channel: 'whatsapp', deviceId: 'DEMO-204' },
-  { id: 2, name: 'Luis Rios', handle: 'LUI-118', contact: '+5215512340002', channel: 'whatsapp', deviceId: 'DEMO-118' },
-];
+const fansSeed: Fan[] = [];
 
-const predictionsSeed: Prediction[] = [
-  { id: 1, userId: 1, matchId: 1, homeScore: 2, awayScore: 1 },
-  { id: 2, userId: 2, matchId: 1, homeScore: 1, awayScore: 0 },
-];
+const predictionsSeed: Prediction[] = [];
 
 const couponsSeed: Coupon[] = [
   { id: 1, merchant: 'Boliche La Final', zone: 'Tlalpan / Azteca', offer: '2x1 en entrada antes de medianoche', rule: 'exact', quantity: 80, link: 'https://maps.google.com/?q=Estadio+Azteca', level: 'Oro', expires: '12 Jun 23:59' },
@@ -128,6 +123,12 @@ const text: Record<Locale, Record<string, string>> = {
     stadiumTime: 'Stadium time',
     fallbackTime: 'Standard time',
     venue: 'Venue',
+    fixtureView: 'View by',
+    filter: 'Search team, city, group or stadium',
+    date: 'Date',
+    group: 'Group',
+    team: 'Team',
+    city: 'City',
   },
   es: {
     kicker: 'Fantasy bet mundialista',
@@ -157,6 +158,12 @@ const text: Record<Locale, Record<string, string>> = {
     stadiumTime: 'Horario estadio',
     fallbackTime: 'Horario estandar',
     venue: 'Estadio',
+    fixtureView: 'Ver por',
+    filter: 'Buscar equipo, ciudad, grupo o estadio',
+    date: 'Fecha',
+    group: 'Grupo',
+    team: 'Equipo',
+    city: 'Ciudad',
   },
   pt: {
     kicker: 'Fantasy bet mundial',
@@ -186,6 +193,12 @@ const text: Record<Locale, Record<string, string>> = {
     stadiumTime: 'Horario do estadio',
     fallbackTime: 'Horario padrao',
     venue: 'Estadio',
+    fixtureView: 'Ver por',
+    filter: 'Buscar time, cidade, grupo ou estadio',
+    date: 'Data',
+    group: 'Grupo',
+    team: 'Time',
+    city: 'Cidade',
   },
   fr: {
     kicker: 'Fantasy bet mondial',
@@ -215,6 +228,12 @@ const text: Record<Locale, Record<string, string>> = {
     stadiumTime: 'Heure du stade',
     fallbackTime: 'Heure standard',
     venue: 'Stade',
+    fixtureView: 'Voir par',
+    filter: 'Chercher equipe, ville, groupe ou stade',
+    date: 'Date',
+    group: 'Groupe',
+    team: 'Equipe',
+    city: 'Ville',
   },
 };
 
@@ -263,6 +282,28 @@ function formatMatchSchedule(match: Match, locale: Locale) {
     stadium,
     usedFallback: local === fallback && stadium === fallback,
   };
+}
+
+function fixtureKey(match: Match, view: FixtureView, locale: Locale) {
+  if (view === 'date') return formatMatchSchedule(match, locale).local.split(',')[0] || match.date;
+  if (view === 'group') return match.group;
+  if (view === 'team') return `${match.homeFlag} / ${match.awayFlag}`;
+  if (view === 'city') return match.city;
+  return match.venue;
+}
+
+function matchSearchText(match: Match) {
+  return [
+    match.group,
+    match.date,
+    match.time,
+    match.city,
+    match.venue,
+    match.home,
+    match.away,
+    match.homeFlag,
+    match.awayFlag,
+  ].join(' ').toLowerCase();
 }
 
 function wins(prediction: Prediction, match: Match, coupon: Coupon) {
@@ -347,7 +388,9 @@ export default function HomePage() {
   const [coupons, setCoupons] = useState(couponsSeed);
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [selectedMatchId, setSelectedMatchId] = useState(matchesSeed[0].id);
-  const [selectedFanId, setSelectedFanId] = useState<number | 'new'>(fansSeed[0].id);
+  const [selectedFanId, setSelectedFanId] = useState<number | 'new'>('new');
+  const [fixtureView, setFixtureView] = useState<FixtureView>('date');
+  const [fixtureFilter, setFixtureFilter] = useState('');
   const [deviceId, setDeviceId] = useState('');
 
   useEffect(() => {
@@ -393,6 +436,18 @@ export default function HomePage() {
   const activeFan = selectedFanId === 'new' ? null : fans.find((fan) => fan.id === selectedFanId) ?? fans[0];
   const selectedMatch = matches.find((match) => match.id === selectedMatchId) ?? matches[0];
   const myPredictions = activeFan ? predictions.filter((prediction) => prediction.userId === activeFan.id) : [];
+  const filteredMatches = useMemo(() => {
+    const search = fixtureFilter.trim().toLowerCase();
+    return matches.filter((match) => !search || matchSearchText(match).includes(search));
+  }, [fixtureFilter, matches]);
+  const fixtureGroups = useMemo(() => {
+    const groups = new Map<string, Match[]>();
+    filteredMatches.forEach((match) => {
+      const key = fixtureKey(match, fixtureView, locale);
+      groups.set(key, [...(groups.get(key) || []), match]);
+    });
+    return [...groups.entries()];
+  }, [filteredMatches, fixtureView, locale]);
   const localVouchers = useMemo(() => {
     if (!activeFan) return [];
     return predictions
@@ -517,39 +572,71 @@ export default function HomePage() {
         </div>
 
         {tab === 'matches' && (
-          <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <section id="fixture" className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="glass-panel rounded-lg p-5">
               <SectionTitle title={t.matches} helper="Choose a match. Prediction opens on the right." />
-              <div className="mt-5 grid gap-3">
-                {matches.map((match) => {
-                  const schedule = formatMatchSchedule(match, locale);
-                  return (
-                    <button
-                      key={match.id}
-                      onClick={() => setSelectedMatchId(match.id)}
-                      className={`fixture-card rounded-lg border p-4 text-left transition ${selectedMatchId === match.id ? 'border-amber-300' : 'border-white/10 hover:border-amber-300/60'}`}
-                      type="button"
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                          <p className="text-xs uppercase tracking-[0.18em] text-slate-400">{match.group} - {match.city}</p>
-                          <h3 className="mt-2 text-xl font-black">{match.homeFlag} {match.home} vs {match.awayFlag} {match.away}</h3>
-                          <div className="mt-3 grid gap-1 text-sm text-slate-300 md:grid-cols-2">
-                            <span>{t.localTime}: <strong className="text-white">{schedule.local}</strong></span>
-                            <span>{t.venue}: <strong className="text-white">{match.venue}</strong></span>
-                            <span className="md:col-span-2">{t.stadiumTime}: {schedule.stadium} - {match.city}</span>
+              <div className="mt-5 grid gap-3 md:grid-cols-[0.7fr_1.3fr]">
+                <label className="grid gap-2 text-sm font-semibold text-slate-300">
+                  {t.fixtureView}
+                  <select
+                    value={fixtureView}
+                    onChange={(event) => setFixtureView(event.target.value as FixtureView)}
+                    className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300"
+                  >
+                    <option value="date">{t.date}</option>
+                    <option value="group">{t.group}</option>
+                    <option value="team">{t.team}</option>
+                    <option value="city">{t.city}</option>
+                    <option value="venue">{t.venue}</option>
+                  </select>
+                </label>
+                <label className="grid gap-2 text-sm font-semibold text-slate-300">
+                  {t.filter}
+                  <input
+                    value={fixtureFilter}
+                    onChange={(event) => setFixtureFilter(event.target.value)}
+                    className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300"
+                    placeholder="Mexico, Grupo A, Toronto..."
+                  />
+                </label>
+              </div>
+              <div className="mt-5 grid gap-5">
+                {fixtureGroups.map(([group, groupMatches]) => (
+                  <div key={group} className="grid gap-3">
+                    <h3 className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">{group}</h3>
+                    {groupMatches.map((match) => {
+                      const schedule = formatMatchSchedule(match, locale);
+                      return (
+                        <button
+                          key={match.id}
+                          onClick={() => setSelectedMatchId(match.id)}
+                          className={`fixture-card rounded-lg border p-4 text-left transition ${selectedMatchId === match.id ? 'border-amber-300' : 'border-white/10 hover:border-amber-300/60'}`}
+                          type="button"
+                        >
+                          <div className="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                              <p className="text-xs uppercase tracking-[0.18em] text-slate-400">{match.group} - {match.city}</p>
+                              <h3 className="mt-2 text-xl font-black">{match.homeFlag} {match.home} vs {match.awayFlag} {match.away}</h3>
+                              <div className="mt-3 grid gap-1 text-sm text-slate-300 md:grid-cols-2">
+                                <span>{t.localTime}: <strong className="text-white">{schedule.local}</strong></span>
+                                <span>{t.venue}: <strong className="text-white">{match.venue}</strong></span>
+                                <span className="md:col-span-2">{t.stadiumTime}: {schedule.stadium} - {match.city}</span>
+                              </div>
+                            </div>
+                            <span className={`rounded-full px-3 py-1 text-xs font-black ${match.homeScore === null ? 'bg-emerald-300 text-slate-950' : 'bg-white/10 text-slate-200'}`}>
+                              {match.homeScore === null ? t.open : t.closed}
+                            </span>
                           </div>
-                        </div>
-                        <span className={`rounded-full px-3 py-1 text-xs font-black ${match.homeScore === null ? 'bg-emerald-300 text-slate-950' : 'bg-white/10 text-slate-200'}`}>
-                          {match.homeScore === null ? t.open : t.closed}
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ))}
+                {fixtureGroups.length === 0 && <Empty text={t.filter} />}
               </div>
             </div>
             <PredictionPanel
+              id="predict"
               t={t}
               match={selectedMatch}
               fans={fans}
@@ -562,7 +649,7 @@ export default function HomePage() {
         )}
 
         {tab === 'predictions' && (
-          <section className="glass-panel rounded-lg p-5">
+          <section id="vouchers" className="glass-panel rounded-lg p-5">
             <SectionTitle title={t.predictions} helper={activeFan ? `${activeFan.name} - ${activeFan.handle}` : t.register} />
             <div className="mt-5 grid gap-3 md:grid-cols-2">
               {myPredictions.map((prediction) => {
@@ -618,7 +705,7 @@ export default function HomePage() {
         )}
 
         {tab === 'promos' && (
-          <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <section id="promos" className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {coupons.map((coupon) => (
               <article key={coupon.id} className="promo-ticket rounded-lg">
                 <div className="bg-gradient-to-r from-amber-300 via-rose-400 to-emerald-300 p-1" />
@@ -640,6 +727,7 @@ export default function HomePage() {
 }
 
 function PredictionPanel({
+  id,
   t,
   match,
   fans,
@@ -648,6 +736,7 @@ function PredictionPanel({
   deviceId,
   savePrediction,
 }: {
+  id?: string;
   t: Record<string, string>;
   match: Match;
   fans: Fan[];
@@ -657,7 +746,7 @@ function PredictionPanel({
   savePrediction: (formData: FormData) => void;
 }) {
   return (
-    <section className="glass-panel rounded-lg p-5">
+    <section id={id} className="glass-panel rounded-lg p-5">
       <SectionTitle title={t.play} helper={`${match.homeFlag} ${match.home} vs ${match.awayFlag} ${match.away}`} />
       <form action={savePrediction} className="mt-5 grid gap-4">
         <input type="hidden" name="matchId" value={match.id} />

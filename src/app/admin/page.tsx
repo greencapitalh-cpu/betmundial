@@ -72,7 +72,7 @@ export default function AdminPromosPage() {
   return (
     <div className="stadium-surface min-h-screen px-4 py-10 text-white">
       <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <section className="glass-panel rounded-lg p-5">
+        <section id="publish" className="glass-panel rounded-lg p-5">
           <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Admin publisher</p>
           <h1 className="mt-1 text-3xl font-black">Publish local promotions</h1>
           <p className="mt-2 text-sm leading-6 text-slate-300">
@@ -99,7 +99,7 @@ export default function AdminPromosPage() {
           </form>
         </section>
 
-        <section className="glass-panel rounded-lg p-5">
+        <section id="board" className="glass-panel rounded-lg p-5">
           <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-300">Live promotion board</p>
           <h2 className="mt-1 text-3xl font-black">Local ads and coupon campaigns</h2>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
