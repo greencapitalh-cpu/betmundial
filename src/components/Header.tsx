@@ -5,21 +5,23 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { localeNames, useLocale, type Locale } from './LocaleProvider';
 
-type NavRole = 'fan' | 'merchant' | 'admin';
+type NavRole = 'portal' | 'fan' | 'merchant' | 'admin';
 
 const roleBrand: Record<NavRole, { title: string; home: string }> = {
-  fan: { title: 'GolazoPromo', home: '/' },
+  portal: { title: 'GolazoPromo', home: '/' },
+  fan: { title: 'Fan App', home: '/fan' },
   merchant: { title: 'Local Console', home: '/merchant' },
   admin: { title: 'Admin Console', home: '/admin' },
 };
 
 const navCopy: Record<Locale, Record<NavRole, Array<{ href: string; label: string }>>> = {
   en: {
+    portal: [],
     fan: [
-      { href: '/#fixture', label: 'Fixture' },
-      { href: '/#predict', label: 'Predict' },
-      { href: '/#vouchers', label: 'My vouchers' },
-      { href: '/#promos', label: 'Promos' },
+      { href: '/fan#fixture', label: 'Fixture' },
+      { href: '/fan#predict', label: 'Predict' },
+      { href: '/fan#vouchers', label: 'My vouchers' },
+      { href: '/fan#promos', label: 'Promos' },
     ],
     merchant: [
       { href: '/merchant#rewards', label: 'Rewards' },
@@ -29,15 +31,16 @@ const navCopy: Record<Locale, Record<NavRole, Array<{ href: string; label: strin
     admin: [
       { href: '/admin#publish', label: 'Publish' },
       { href: '/admin#board', label: 'Board' },
-      { href: '/', label: 'Fan app' },
+      { href: '/fan', label: 'Fan app' },
     ],
   },
   es: {
+    portal: [],
     fan: [
-      { href: '/#fixture', label: 'Fixture' },
-      { href: '/#predict', label: 'Pronosticar' },
-      { href: '/#vouchers', label: 'Mis vales' },
-      { href: '/#promos', label: 'Promos' },
+      { href: '/fan#fixture', label: 'Fixture' },
+      { href: '/fan#predict', label: 'Pronosticar' },
+      { href: '/fan#vouchers', label: 'Mis vales' },
+      { href: '/fan#promos', label: 'Promos' },
     ],
     merchant: [
       { href: '/merchant#rewards', label: 'Premios' },
@@ -47,15 +50,16 @@ const navCopy: Record<Locale, Record<NavRole, Array<{ href: string; label: strin
     admin: [
       { href: '/admin#publish', label: 'Publicar' },
       { href: '/admin#board', label: 'Tablero' },
-      { href: '/', label: 'App usuario' },
+      { href: '/fan', label: 'App usuario' },
     ],
   },
   pt: {
+    portal: [],
     fan: [
-      { href: '/#fixture', label: 'Tabela' },
-      { href: '/#predict', label: 'Apostar' },
-      { href: '/#vouchers', label: 'Meus cupons' },
-      { href: '/#promos', label: 'Promos' },
+      { href: '/fan#fixture', label: 'Tabela' },
+      { href: '/fan#predict', label: 'Apostar' },
+      { href: '/fan#vouchers', label: 'Meus cupons' },
+      { href: '/fan#promos', label: 'Promos' },
     ],
     merchant: [
       { href: '/merchant#rewards', label: 'Premios' },
@@ -65,15 +69,16 @@ const navCopy: Record<Locale, Record<NavRole, Array<{ href: string; label: strin
     admin: [
       { href: '/admin#publish', label: 'Publicar' },
       { href: '/admin#board', label: 'Painel' },
-      { href: '/', label: 'App usuario' },
+      { href: '/fan', label: 'App usuario' },
     ],
   },
   fr: {
+    portal: [],
     fan: [
-      { href: '/#fixture', label: 'Calendrier' },
-      { href: '/#predict', label: 'Pronostiquer' },
-      { href: '/#vouchers', label: 'Mes coupons' },
-      { href: '/#promos', label: 'Promos' },
+      { href: '/fan#fixture', label: 'Calendrier' },
+      { href: '/fan#predict', label: 'Pronostiquer' },
+      { href: '/fan#vouchers', label: 'Mes coupons' },
+      { href: '/fan#promos', label: 'Promos' },
     ],
     merchant: [
       { href: '/merchant#rewards', label: 'Prix' },
@@ -83,7 +88,7 @@ const navCopy: Record<Locale, Record<NavRole, Array<{ href: string; label: strin
     admin: [
       { href: '/admin#publish', label: 'Publier' },
       { href: '/admin#board', label: 'Tableau' },
-      { href: '/', label: 'App fan' },
+      { href: '/fan', label: 'App fan' },
     ],
   },
 };
@@ -92,7 +97,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { locale, setLocale } = useLocale();
   const pathname = usePathname();
-  const role: NavRole = pathname.startsWith('/merchant') ? 'merchant' : pathname.startsWith('/admin') ? 'admin' : 'fan';
+  const role: NavRole = pathname.startsWith('/merchant') ? 'merchant' : pathname.startsWith('/admin') ? 'admin' : pathname.startsWith('/fan') ? 'fan' : 'portal';
   const brand = roleBrand[role];
   const navLinks = navCopy[locale][role];
 
