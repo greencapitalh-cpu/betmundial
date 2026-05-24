@@ -16,6 +16,7 @@ type MerchantReward = {
   quantity: number;
   expires: string;
   image: string;
+  city: string;
 };
 
 type VisitPromo = {
@@ -24,6 +25,12 @@ type VisitPromo = {
   description: string;
   image: string;
   link: string;
+  city: string;
+  address: string;
+  instagram: string;
+  facebook: string;
+  tiktok: string;
+  whatsapp: string;
   expires: string;
 };
 
@@ -53,11 +60,11 @@ export default function MerchantVerifyPage() {
   const [apiVoucher, setApiVoucher] = useState<ApiVoucher | null>(null);
   const [verifyError, setVerifyError] = useState('');
   const [rewards, setRewards] = useState<MerchantReward[]>([
-    { id: 1, title: 'Exact score night', prize: '2x1 en entrada antes de medianoche', rule: 'exact', quantity: 80, expires: '12 Jun 23:59', image: '/world-cup-abstract-bg.png' },
-    { id: 2, title: 'Winner pick promo', prize: 'Shot de bienvenida para mesa mundialista', rule: 'winner', quantity: 120, expires: '30 Jun 23:59', image: '/world-cup-abstract-bg.png' },
+    { id: 1, title: 'Exact score night', prize: '2x1 en entrada antes de medianoche', rule: 'exact', quantity: 80, expires: '12 Jun 23:59', image: '/world-cup-abstract-bg.png', city: 'Mexico City' },
+    { id: 2, title: 'Winner pick promo', prize: 'Shot de bienvenida para mesa mundialista', rule: 'winner', quantity: 120, expires: '30 Jun 23:59', image: '/world-cup-abstract-bg.png', city: 'Guadalajara' },
   ]);
   const [visitPromos, setVisitPromos] = useState<VisitPromo[]>([
-    { id: 1, title: 'Happy hour mundialista', description: '10% off mostrando la app en barra.', image: '/world-cup-abstract-bg.png', link: 'https://maps.google.com', expires: 'Durante partidos' },
+    { id: 1, title: 'Happy hour mundialista', description: '10% off mostrando la app en barra.', image: '/world-cup-abstract-bg.png', link: 'https://maps.google.com', city: 'Mexico City', address: 'Zona estadio', instagram: '', facebook: '', tiktok: '', whatsapp: '', expires: 'Durante partidos' },
   ]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -81,6 +88,7 @@ export default function MerchantVerifyPage() {
         quantity: Number(row.quantity || 0),
         expires: String(row.expires_at || ''),
         image: String(row.image_url || '/world-cup-abstract-bg.png'),
+        city: String(row.campaign_city || row.city || row.merchant_city || ''),
       }))))
       .catch(() => undefined);
 
@@ -92,6 +100,12 @@ export default function MerchantVerifyPage() {
         description: String(row.description || ''),
         image: String(row.image_url || '/world-cup-abstract-bg.png'),
         link: String(row.link || '#'),
+        city: String(row.campaign_city || row.city || row.merchant_city || ''),
+        address: String(row.campaign_address || row.address || ''),
+        instagram: String(row.campaign_instagram_url || row.instagram_url || ''),
+        facebook: String(row.campaign_facebook_url || row.facebook_url || ''),
+        tiktok: String(row.campaign_tiktok_url || row.tiktok_url || ''),
+        whatsapp: String(row.campaign_whatsapp_url || row.whatsapp_url || ''),
         expires: String(row.expires_at || ''),
       }))))
       .catch(() => undefined);
@@ -170,6 +184,7 @@ export default function MerchantVerifyPage() {
         prize: String(formData.get('prize') || 'Premio especial'),
         rule: String(formData.get('rule')),
         quantity: Number(formData.get('quantity') || 50),
+        city: String(formData.get('city') || ''),
         expires_at: String(formData.get('expires') || 'Durante el mundial'),
         image_url: image,
       }),
@@ -182,6 +197,7 @@ export default function MerchantVerifyPage() {
       quantity: Number(formData.get('quantity') || 50),
       expires: String(formData.get('expires') || 'Durante el mundial'),
       image,
+      city: String(formData.get('city') || ''),
     }, ...current]);
   }
 
@@ -195,7 +211,13 @@ export default function MerchantVerifyPage() {
         title: String(formData.get('title') || 'Promo por visita'),
         description: String(formData.get('description') || 'Beneficio mostrando la app'),
         image_url: image,
+        city: String(formData.get('city') || ''),
+        address: String(formData.get('address') || ''),
         link: String(formData.get('link') || 'https://maps.google.com'),
+        instagram_url: String(formData.get('instagram') || ''),
+        facebook_url: String(formData.get('facebook') || ''),
+        tiktok_url: String(formData.get('tiktok') || ''),
+        whatsapp_url: String(formData.get('whatsapp') || ''),
         expires_at: String(formData.get('expires') || 'Durante el mundial'),
       }),
     }).catch(() => undefined);
@@ -205,6 +227,12 @@ export default function MerchantVerifyPage() {
       description: String(formData.get('description') || 'Beneficio mostrando la app'),
       image,
       link: String(formData.get('link') || 'https://maps.google.com'),
+      city: String(formData.get('city') || ''),
+      address: String(formData.get('address') || ''),
+      instagram: String(formData.get('instagram') || ''),
+      facebook: String(formData.get('facebook') || ''),
+      tiktok: String(formData.get('tiktok') || ''),
+      whatsapp: String(formData.get('whatsapp') || ''),
       expires: String(formData.get('expires') || 'Durante el mundial'),
     }, ...current]);
   }
@@ -218,7 +246,7 @@ export default function MerchantVerifyPage() {
               <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Merchant cockpit</p>
               <h1 className="mt-2 max-w-3xl text-4xl font-black leading-tight md:text-5xl">Premios, promos y validacion QR en un solo panel.</h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-                El local publica beneficios por acierto, carga promos abiertas por visita y verifica cada vale con codigo o QR en el punto de venta.
+                El local publica beneficios por acierto, carga promos abiertas por visita, segmenta por ciudad o zona comercial y verifica cada vale con codigo o QR.
               </p>
             </div>
             <div className="grid grid-cols-3 gap-3 lg:w-[360px]">
@@ -240,6 +268,7 @@ export default function MerchantVerifyPage() {
             <form action={addReward} className="mt-6 grid gap-4">
               <Field name="title" label="Nombre de la campaña" placeholder="Noche de marcador exacto" />
               <Field name="prize" label="Premio / vale" placeholder="2x1 en entrada, bebida gratis, descuento..." />
+              <Field name="city" label="Ciudad o mercado de la campaña" placeholder="La Paz, Bogotá, Lima, Miami..." />
               <FileField label="Foto del premio" />
               <label className="grid gap-2 text-sm font-semibold text-slate-300">
                 Tipo de acierto
@@ -273,6 +302,7 @@ export default function MerchantVerifyPage() {
                       <span className="rounded-full bg-amber-300 px-2 py-1 text-xs font-black text-slate-950">{ruleLabel(reward.rule)}</span>
                       <h3 className="mt-4 text-xl font-black">{reward.title}</h3>
                       <p className="mt-2 text-slate-300">{reward.prize}</p>
+                      {reward.city && <p className="mt-2 text-sm font-bold text-emerald-200">{reward.city}</p>}
                     </div>
                     <div className="rounded-md bg-white/10 px-3 py-2 text-right">
                       <strong className="text-2xl text-amber-300">{reward.quantity}</strong>
@@ -296,8 +326,18 @@ export default function MerchantVerifyPage() {
             <form action={addVisitPromo} className="mt-6 grid gap-4">
               <Field name="title" label="Titulo de la promo" placeholder="Happy hour mundialista" />
               <Field name="description" label="En que consiste" placeholder="10% off mostrando la app" />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Field name="city" label="Ciudad o mercado" placeholder="La Paz, Bogotá, Lima, Miami..." />
+                <Field name="address" label="Dirección textual" placeholder="Calle, número, zona" />
+              </div>
               <FileField label="Foto o banner de la promo" />
-              <Field name="link" label="Link del local" placeholder="Instagram, web o Google Maps" />
+              <Field name="link" label="Link principal / Maps" placeholder="Google Maps o web" />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <OptionalField name="instagram" label="Instagram" placeholder="https://instagram.com/local" />
+                <OptionalField name="facebook" label="Facebook" placeholder="https://facebook.com/local" />
+                <OptionalField name="tiktok" label="TikTok" placeholder="https://tiktok.com/@local" />
+                <OptionalField name="whatsapp" label="WhatsApp" placeholder="https://wa.me/..." />
+              </div>
               <Field name="expires" label="Vigencia" placeholder="Durante partidos" />
               <button className="fantasy-button h-12 rounded-md font-black transition">Publicar promo por visita</button>
             </form>
@@ -314,8 +354,10 @@ export default function MerchantVerifyPage() {
                     <span className="rounded-full bg-emerald-300 px-2 py-1 text-xs font-black text-slate-950">Por visitar</span>
                     <h3 className="mt-4 text-xl font-black">{promo.title}</h3>
                     <p className="mt-2 text-slate-300">{promo.description}</p>
+                    <p className="mt-2 text-sm font-bold text-emerald-200">{promo.city}</p>
+                    <p className="mt-1 text-sm text-slate-400">{promo.address}</p>
                     <p className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-400">Vigencia: {promo.expires}</p>
-                    <a href={promo.link} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-md bg-white px-4 py-2 text-sm font-black text-slate-950">Abrir link</a>
+                    <SocialLinks links={[promo.link, promo.instagram, promo.facebook, promo.tiktok, promo.whatsapp]} />
                   </div>
                 </article>
               ))}
@@ -396,6 +438,20 @@ export default function MerchantVerifyPage() {
   );
 }
 
+function SocialLinks({ links }: { links: string[] }) {
+  const cleanLinks = links.filter(Boolean);
+  if (cleanLinks.length === 0) return null;
+  return (
+    <div className="mt-4 flex flex-wrap gap-2">
+      {cleanLinks.map((link, index) => (
+        <a key={`${link}-${index}`} href={link} target="_blank" rel="noreferrer" className="rounded-md bg-white px-3 py-2 text-xs font-black text-slate-950">
+          Link {index + 1}
+        </a>
+      ))}
+    </div>
+  );
+}
+
 function ruleLabel(rule: RewardRule) {
   const labels: Record<RewardRule, string> = {
     winner: 'Ganador',
@@ -423,6 +479,15 @@ function Field({ name, label, placeholder, type = 'text' }: { name: string; labe
     <label className="grid gap-2 text-sm font-semibold text-slate-300">
       {label}
       <input name={name} type={type} min={type === 'number' ? 1 : undefined} placeholder={placeholder} className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" required />
+    </label>
+  );
+}
+
+function OptionalField({ name, label, placeholder }: { name: string; label: string; placeholder: string }) {
+  return (
+    <label className="grid gap-2 text-sm font-semibold text-slate-300">
+      {label}
+      <input name={name} placeholder={placeholder} className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" />
     </label>
   );
 }

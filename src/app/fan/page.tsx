@@ -47,11 +47,18 @@ type Prediction = {
 type Coupon = {
   id: number;
   merchant: string;
+  city: string;
   zone: string;
+  address: string;
   offer: string;
   rule: CouponRule;
   quantity: number;
   link: string;
+  instagram: string;
+  facebook: string;
+  tiktok: string;
+  whatsapp: string;
+  image: string;
   level: 'Oro' | 'Plata' | 'Barrio';
   expires: string;
 };
@@ -89,10 +96,10 @@ const fansSeed: Fan[] = [];
 const predictionsSeed: Prediction[] = [];
 
 const couponsSeed: Coupon[] = [
-  { id: 1, merchant: 'Boliche La Final', zone: 'Tlalpan / Azteca', offer: '2x1 en entrada antes de medianoche', rule: 'exact', quantity: 80, link: 'https://maps.google.com/?q=Estadio+Azteca', level: 'Oro', expires: '12 Jun 23:59' },
-  { id: 2, merchant: 'Terraza Gol Norte', zone: 'Guadalajara', offer: 'Bucket 3x2 para mesa mundialista', rule: 'winner', quantity: 120, link: 'https://maps.google.com/?q=Estadio+Akron', level: 'Plata', expires: '13 Jun 23:59' },
-  { id: 3, merchant: 'Fan Zone Burger', zone: 'Monterrey', offer: 'Papas gratis con cualquier combo', rule: 'participate', quantity: 200, link: 'https://maps.google.com/?q=Estadio+BBVA', level: 'Barrio', expires: '30 Jun 23:59' },
-  { id: 4, merchant: 'After Match Club', zone: 'Miami', offer: '15% off en lista VIP', rule: 'exact', quantity: 60, link: 'https://maps.google.com/?q=Hard+Rock+Stadium', level: 'Oro', expires: '18 Jun 23:59' },
+  { id: 1, merchant: 'Boliche La Final', city: 'La Paz', zone: 'Centro', address: 'Zona comercial', offer: '2x1 en entrada antes de medianoche', rule: 'exact', quantity: 80, link: 'https://maps.google.com', instagram: '', facebook: '', tiktok: '', whatsapp: '', image: '/world-cup-abstract-bg.png', level: 'Oro', expires: '12 Jun 23:59' },
+  { id: 2, merchant: 'Terraza Gol Norte', city: 'Guadalajara', zone: 'Zapopan', address: 'Zona bar', offer: 'Bucket 3x2 para mesa mundialista', rule: 'winner', quantity: 120, link: 'https://maps.google.com', instagram: '', facebook: '', tiktok: '', whatsapp: '', image: '/world-cup-abstract-bg.png', level: 'Plata', expires: '13 Jun 23:59' },
+  { id: 3, merchant: 'Fan Zone Burger', city: 'Monterrey', zone: 'San Pedro', address: 'Zona restaurante', offer: 'Papas gratis con cualquier combo', rule: 'participate', quantity: 200, link: 'https://maps.google.com', instagram: '', facebook: '', tiktok: '', whatsapp: '', image: '/world-cup-abstract-bg.png', level: 'Barrio', expires: '30 Jun 23:59' },
+  { id: 4, merchant: 'After Match Club', city: 'Santa Cruz', zone: 'Equipetrol', address: 'Zona nightlife', offer: '15% off en lista VIP', rule: 'exact', quantity: 60, link: 'https://maps.google.com', instagram: '', facebook: '', tiktok: '', whatsapp: '', image: '/world-cup-abstract-bg.png', level: 'Oro', expires: '18 Jun 23:59' },
 ];
 
 const text: Record<Locale, Record<string, string>> = {
@@ -472,11 +479,18 @@ function mapReward(row: Record<string, unknown>): Coupon {
   return {
     id: Number(row.id),
     merchant: String(row.merchant_name || ''),
+    city: String(row.campaign_city || row.city || row.merchant_city || ''),
     zone: String(row.zone || ''),
+    address: String(row.address || ''),
     offer: String(row.prize || ''),
     rule: String(row.rule || 'participate') as CouponRule,
     quantity: Number(row.quantity || 0),
     link: String(row.link || '#'),
+    instagram: String(row.instagram_url || ''),
+    facebook: String(row.facebook_url || ''),
+    tiktok: String(row.tiktok_url || ''),
+    whatsapp: String(row.whatsapp_url || ''),
+    image: String(row.image_url || '/world-cup-abstract-bg.png'),
     level: 'Oro',
     expires: String(row.expires_at || ''),
   };
@@ -495,6 +509,7 @@ export default function HomePage() {
   const [selectedFanId, setSelectedFanId] = useState<number | 'new'>('new');
   const [fixtureView, setFixtureView] = useState<FixtureView>('date');
   const [fixtureFilter, setFixtureFilter] = useState('');
+  const [promoCityFilter, setPromoCityFilter] = useState('');
   const [deviceId, setDeviceId] = useState('');
 
   useEffect(() => {
@@ -551,6 +566,14 @@ export default function HomePage() {
     });
     return [...groups.entries()];
   }, [filteredMatches, fixtureView, locale]);
+  const promoCities = useMemo(() => {
+    return [...new Set(coupons.map((coupon) => coupon.city).filter(Boolean))].sort();
+  }, [coupons]);
+  const filteredCoupons = useMemo(() => {
+    const needle = promoCityFilter.trim().toLowerCase();
+    if (!needle) return coupons;
+    return coupons.filter((coupon) => [coupon.city, coupon.zone, coupon.merchant].some((value) => value.toLowerCase().includes(needle)));
+  }, [coupons, promoCityFilter]);
   const localVouchers = useMemo(() => {
     if (!activeFan) return [];
     return predictions
@@ -819,23 +842,59 @@ export default function HomePage() {
         )}
 
         {tab === 'promos' && (
-          <section id="promos" className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {coupons.map((coupon) => (
+          <section id="promos" className="grid gap-5">
+            <div className="glass-panel rounded-lg p-5">
+              <SectionTitle title={t.promos} helper="Find campaigns by any city or commercial market. They do not need to be World Cup host cities." />
+              <div className="mt-5 grid gap-3 md:grid-cols-[1fr_auto]">
+                <input
+                  value={promoCityFilter}
+                  onChange={(event) => setPromoCityFilter(event.target.value)}
+                  placeholder="Buscar ciudad, zona o local"
+                  className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300"
+                />
+                <div className="flex flex-wrap gap-2">
+                  {promoCities.slice(0, 8).map((city) => (
+                    <button key={city} type="button" onClick={() => setPromoCityFilter(city)} className="rounded-md bg-white/10 px-3 py-2 text-sm font-black text-slate-100">
+                      {city}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {filteredCoupons.map((coupon) => (
               <article key={coupon.id} className="promo-ticket rounded-lg">
-                <div className="bg-gradient-to-r from-amber-300 via-rose-400 to-emerald-300 p-1" />
+                <img src={coupon.image} alt={coupon.offer} className="h-36 w-full rounded-t-lg object-cover" />
                 <div className="p-4">
                   <span className="rounded-full bg-amber-300 px-2 py-1 text-xs font-black text-slate-950">{coupon.level}</span>
                   <h3 className="mt-4 text-xl font-black">{coupon.offer}</h3>
                   <p className="mt-2 text-sm text-slate-300">{coupon.merchant}</p>
+                  <p className="mt-1 text-sm font-bold text-emerald-200">{coupon.city}</p>
                   <p className="mt-1 text-sm text-slate-400">{coupon.zone}</p>
+                  <p className="mt-1 text-xs text-slate-500">{coupon.address}</p>
                   <p className="mt-3 text-xs text-amber-200">{coupon.quantity} {t.available}</p>
-                  <a href={coupon.link} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-md bg-white px-4 py-2 text-sm font-black text-slate-950">{t.go}</a>
+                  <SocialLinks links={[coupon.link, coupon.instagram, coupon.facebook, coupon.tiktok, coupon.whatsapp]} label={t.go} />
                 </div>
               </article>
             ))}
+            </div>
           </section>
         )}
       </main>
+    </div>
+  );
+}
+
+function SocialLinks({ links, label }: { links: string[]; label: string }) {
+  const cleanLinks = links.filter(Boolean);
+  if (cleanLinks.length === 0) return null;
+  return (
+    <div className="mt-4 flex flex-wrap gap-2">
+      {cleanLinks.map((link, index) => (
+        <a key={`${link}-${index}`} href={link} target="_blank" rel="noreferrer" className="rounded-md bg-white px-3 py-2 text-xs font-black text-slate-950">
+          {index === 0 ? label : `Red ${index}`}
+        </a>
+      ))}
     </div>
   );
 }

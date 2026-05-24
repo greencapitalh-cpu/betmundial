@@ -1,7 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import { useLocale, type Locale } from '@/components/LocaleProvider';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bet2back-production.up.railway.app';
 
 const copy: Record<Locale, {
   kicker: string;
@@ -74,6 +77,32 @@ const cards = [
 export default function PortalPage() {
   const { locale } = useLocale();
   const t = copy[locale];
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('register');
+  const [authRole, setAuthRole] = useState<'fan' | 'merchant' | 'admin'>('fan');
+  const [authMessage, setAuthMessage] = useState('');
+
+  async function submitAuth(formData: FormData) {
+    const payload = {
+      role: authRole,
+      name: String(formData.get('name') || ''),
+      email: String(formData.get('email') || ''),
+      password: String(formData.get('password') || ''),
+      city: String(formData.get('city') || ''),
+      merchant_name: String(formData.get('merchant_name') || ''),
+    };
+    const response = await fetch(`${API_URL}/api/auth/${authMode}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      setAuthMessage('No se pudo completar el acceso. Revisa email y contraseña.');
+      return;
+    }
+    const account = await response.json();
+    window.localStorage.setItem('golazo-account', JSON.stringify(account));
+    setAuthMessage(`Cuenta ${account.role} lista para ${account.city || 'tu ciudad'}.`);
+  }
 
   return (
     <div className="stadium-surface min-h-screen text-white">
@@ -91,6 +120,34 @@ export default function PortalPage() {
           </div>
 
           <div className="grid gap-4">
+            <section className="glass-panel rounded-lg p-5">
+              <div className="flex gap-2">
+                {(['register', 'login'] as const).map((mode) => (
+                  <button key={mode} type="button" onClick={() => setAuthMode(mode)} className={`h-10 rounded-md px-4 text-sm font-black ${authMode === mode ? 'bg-amber-300 text-slate-950' : 'bg-white/10 text-slate-200'}`}>
+                    {mode === 'register' ? 'Register' : 'Login'}
+                  </button>
+                ))}
+              </div>
+              <form action={submitAuth} className="mt-4 grid gap-3">
+                <div className="grid grid-cols-3 gap-2">
+                  {(['fan', 'merchant', 'admin'] as const).map((role) => (
+                    <button key={role} type="button" onClick={() => setAuthRole(role)} className={`h-10 rounded-md text-sm font-black ${authRole === role ? 'bg-white text-slate-950' : 'bg-white/10 text-slate-200'}`}>
+                      {role}
+                    </button>
+                  ))}
+                </div>
+                {authMode === 'register' && <AuthField name="name" placeholder="Nombre" />}
+                {authMode === 'register' && authRole === 'merchant' && <AuthField name="merchant_name" placeholder="Nombre del local" />}
+                {authMode === 'register' && <AuthField name="city" placeholder="Ciudad o mercado" />}
+                <AuthField name="email" placeholder="Email" type="email" />
+                <AuthField name="password" placeholder="Password" type="password" />
+                <button className="fantasy-button h-11 rounded-md font-black" type="submit">
+                  {authMode === 'register' ? 'Crear cuenta' : 'Entrar'}
+                </button>
+                {authMessage && <p className="rounded-md bg-white/10 p-3 text-sm text-slate-200">{authMessage}</p>}
+              </form>
+            </section>
+
             {cards.map((card) => (
               <Link key={card.key} href={card.href} className="promo-ticket role-card group block rounded-lg p-1 transition hover:border-amber-300/70">
                 <div className={`h-2 rounded-t-md bg-gradient-to-r ${card.tone}`} />
@@ -109,6 +166,18 @@ export default function PortalPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+function AuthField({ name, placeholder, type = 'text' }: { name: string; placeholder: string; type?: string }) {
+  return (
+    <input
+      name={name}
+      type={type}
+      placeholder={placeholder}
+      className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300"
+      required
+    />
   );
 }
 
