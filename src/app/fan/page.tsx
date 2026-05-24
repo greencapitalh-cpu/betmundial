@@ -678,7 +678,7 @@ export default function HomePage() {
     try {
       const payload = {
         role: 'fan',
-        name: String(formData.get('name') || formData.get('email') || 'Fan'),
+        name: String(formData.get('email') || 'Fan'),
         email: String(formData.get('email') || '').trim().toLowerCase(),
         password: String(formData.get('password') || ''),
         city: String(formData.get('city') || ''),
@@ -721,6 +721,11 @@ export default function HomePage() {
       <SponsorRibbon coupons={coupons} setTab={setTab} />
 
       <main className="mx-auto max-w-7xl px-4 py-8">
+        {account?.role === 'fan' && (
+          <div className="mb-5 rounded-lg border border-emerald-300/25 bg-emerald-300/10 p-4">
+            <p className="text-sm font-black text-emerald-200">Welcome, {account.email}</p>
+          </div>
+        )}
         <div className="tab-strip sticky top-[65px] z-30 mb-6 grid grid-cols-2 gap-2 rounded-lg border border-white/10 p-2 backdrop-blur-xl md:grid-cols-5">
           {(['matches', 'bracket', 'predictions', 'vouchers', 'promos'] as Tab[]).map((item) => (
             <button
@@ -1017,10 +1022,10 @@ function PredictionPanel({
           <div className="fan-card grid gap-3 rounded-lg border border-amber-300/20 p-4">
             <div className="rounded-md border border-white/10 bg-slate-950/80 p-3">
               <span className="text-xs uppercase tracking-[0.18em] text-amber-300">Cuenta activa</span>
-              <strong className="mt-1 block text-lg">{account.name}</strong>
-              <span className="mt-1 block text-xs text-slate-400">{account.email} - {t.device}: {deviceId || 'Generating...'}</span>
+              <strong className="mt-1 block text-lg">Welcome, {account.email}</strong>
+              <span className="mt-1 block text-xs text-slate-400">{t.device}: {deviceId || 'Generating...'}</span>
             </div>
-            <input type="hidden" name="name" value={account.name} />
+            <input type="hidden" name="name" value={account.email} />
             <input type="hidden" name="contact" value={account.email} />
             {fans.length > 1 && (
               <label className="grid gap-2 text-sm font-semibold text-slate-300">
@@ -1053,12 +1058,19 @@ function FanAuthGate({ authenticateFan, message }: { authenticateFan: (formData:
     <div className="mt-5 rounded-lg border border-amber-300/25 bg-slate-950/75 p-4">
       <p className="text-sm font-black uppercase tracking-[0.18em] text-amber-300">Registro para guardar</p>
       <p className="mt-2 text-sm text-slate-300">Puedes mirar fixture y promos libremente. Para guardar tu marcador necesitamos identificarte.</p>
-      <form action={authenticateFan} className="mt-4 grid gap-3 md:grid-cols-[0.75fr_1fr_1fr_1fr_auto]">
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        <a href={`${API_URL}/api/auth/oauth/google/start`} className="h-11 rounded-md bg-white px-4 py-3 text-center text-sm font-black text-slate-950">
+          Continue with Google
+        </a>
+        <a href={`${API_URL}/api/auth/oauth/facebook/start`} className="h-11 rounded-md bg-[#1877f2] px-4 py-3 text-center text-sm font-black text-white">
+          Continue with Facebook
+        </a>
+      </div>
+      <form action={authenticateFan} className="mt-4 grid gap-3 md:grid-cols-[0.75fr_1fr_1fr_auto]">
         <select name="mode" className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300">
           <option value="login">Login</option>
           <option value="register">Registro</option>
         </select>
-        <input name="name" placeholder="Nombre" className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" />
         <input name="email" type="email" placeholder="Email" className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" required />
         <input name="password" type="password" placeholder="Password" className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" required />
         <button className="h-11 rounded-md bg-white px-4 font-black text-slate-950" type="submit">Entrar</button>
