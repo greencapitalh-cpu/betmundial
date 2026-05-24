@@ -413,6 +413,14 @@ function matchStatusLabel(match: Match) {
   return `${match.homeScore}-${match.awayScore}`;
 }
 
+function canEditPrediction(match: Match) {
+  if (match.homeScore !== null || match.awayScore !== null || match.status === 'final') return false;
+  if (!match.kickoffUtc) return true;
+  const kickoff = new Date(match.kickoffUtc);
+  if (Number.isNaN(kickoff.getTime())) return true;
+  return kickoff.getTime() > Date.now();
+}
+
 function knockoutMatches(matches: Match[], from: number, to: number) {
   return matches.filter((match) => match.id >= from && match.id <= to).sort((a, b) => a.id - b.id);
 }
@@ -559,6 +567,7 @@ export default function HomePage() {
   const activeFan = selectedFanId === 'new' ? null : fans.find((fan) => fan.id === selectedFanId) ?? fans[0];
   const selectedMatch = matches.find((match) => match.id === selectedMatchId) ?? matches[0];
   const myPredictions = activeFan ? predictions.filter((prediction) => prediction.userId === activeFan.id) : [];
+  const selectedPrediction = activeFan ? myPredictions.find((prediction) => prediction.matchId === selectedMatch.id) : undefined;
   const filteredMatches = useMemo(() => {
     return matches.filter((match) => matchesFixtureDetail(match, fixtureView, fixtureFilter, locale));
   }, [fixtureFilter, fixtureView, locale, matches]);
@@ -609,6 +618,10 @@ export default function HomePage() {
   async function savePrediction(formData: FormData) {
     if (!account || account.role !== 'fan') {
       setAuthMessage('Registrate o inicia sesion para guardar tu marcador.');
+      return;
+    }
+    if (!canEditPrediction(selectedMatch)) {
+      setAuthMessage('Este partido ya empezo o tiene resultado cargado. La prediccion ya no se puede editar.');
       return;
     }
     let userId = Number(formData.get('userId'));
@@ -670,6 +683,14 @@ export default function HomePage() {
       setPredictions((current) => [nextPrediction, ...current]);
     }
     setTab('predictions');
+  }
+
+  function selectMatchForPrediction(matchId: number) {
+    setTab('matches');
+    setSelectedMatchId(matchId);
+    window.setTimeout(() => {
+      document.getElementById('predict')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 80);
   }
 
   async function authenticateFan(formData: FormData) {
@@ -778,7 +799,7 @@ export default function HomePage() {
                       return (
                         <button
                           key={match.id}
-                          onClick={() => setSelectedMatchId(match.id)}
+                          onClick={() => selectMatchForPrediction(match.id)}
                           className={`fixture-card rounded-lg border p-4 text-left transition ${selectedMatchId === match.id ? 'border-amber-300' : 'border-white/10 hover:border-amber-300/60'}`}
                           type="button"
                         >
@@ -813,6 +834,7 @@ export default function HomePage() {
               setSelectedFanId={setSelectedFanId}
               deviceId={deviceId}
               savePrediction={savePrediction}
+              existingPrediction={selectedPrediction}
               account={account}
               authMessage={authMessage}
               authenticateFan={authenticateFan}
@@ -842,6 +864,15 @@ export default function HomePage() {
                     <p className="text-sm text-slate-400">{match?.group} - {schedule?.local}</p>
                     <h3 className="mt-2 text-xl font-black">{match?.homeFlag} {match?.home} {prediction.homeScore}-{prediction.awayScore} {match?.awayFlag} {match?.away}</h3>
                     <p className="mt-2 text-sm text-slate-400">{match?.venue} - {match?.city}</p>
+                    {match && canEditPrediction(match) && (
+                      <button
+                        type="button"
+                        onClick={() => selectMatchForPrediction(match.id)}
+                        className="mt-4 rounded-md bg-white px-4 py-2 text-sm font-black text-slate-950"
+                      >
+                        Modificar prediccion
+                      </button>
+                    )}
                   </article>
                 );
               })}
@@ -983,6 +1014,7 @@ function PredictionPanel({
   setSelectedFanId,
   deviceId,
   savePrediction,
+  existingPrediction,
   account,
   authMessage,
   authenticateFan,
@@ -995,21 +1027,33 @@ function PredictionPanel({
   setSelectedFanId: (id: number | 'new') => void;
   deviceId: string;
   savePrediction: (formData: FormData) => void | Promise<void>;
+  existingPrediction?: Prediction;
   account: Account | null;
   authMessage: string;
   authenticateFan: (formData: FormData) => void | Promise<void>;
 }) {
   const [homeScore, setHomeScore] = useState(0);
   const [awayScore, setAwayScore] = useState(0);
+  const editable = canEditPrediction(match);
 
   useEffect(() => {
-    setHomeScore(0);
-    setAwayScore(0);
-  }, [match.id]);
+    setHomeScore(existingPrediction?.homeScore ?? 0);
+    setAwayScore(existingPrediction?.awayScore ?? 0);
+  }, [match.id, existingPrediction?.homeScore, existingPrediction?.awayScore]);
 
   return (
     <section id={id} className="glass-panel rounded-lg p-5">
       <SectionTitle title={t.play} helper={`${match.homeFlag} ${match.home} vs ${match.awayFlag} ${match.away}`} />
+      {existingPrediction && (
+        <p className="mt-3 rounded-md bg-amber-300/10 p-3 text-sm font-bold text-amber-100">
+          Ya guardaste {existingPrediction.homeScore}-{existingPrediction.awayScore}. Puedes modificarla hasta antes del inicio del partido.
+        </p>
+      )}
+      {!editable && (
+        <p className="mt-3 rounded-md bg-rose-400/15 p-3 text-sm font-bold text-rose-100">
+          Predicciones cerradas para este partido.
+        </p>
+      )}
       {(!account || account.role !== 'fan') && (
         <FanAuthGate authenticateFan={authenticateFan} message={authMessage} />
       )}
@@ -1047,7 +1091,9 @@ function PredictionPanel({
           <div className="hidden text-center text-3xl font-black text-amber-300 sm:block">:</div>
           <ScoreStepper label={match.away} code={match.awayFlag} value={awayScore} setValue={setAwayScore} />
         </div>
-        <button disabled={!account || account.role !== 'fan'} className="fantasy-button h-12 rounded-md font-black transition disabled:cursor-not-allowed disabled:opacity-45">{t.save}</button>
+        <button disabled={!account || account.role !== 'fan' || !editable} className="fantasy-button h-12 rounded-md font-black transition disabled:cursor-not-allowed disabled:opacity-45">
+          {existingPrediction ? 'Modificar prediccion' : t.save}
+        </button>
       </form>
     </section>
   );
