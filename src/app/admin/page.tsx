@@ -111,13 +111,16 @@ export default function AdminPromosPage() {
       .catch(() => undefined);
   }, []);
 
-  async function loginAdmin(formData: FormData) {
+  async function authenticateAdmin(formData: FormData) {
+    const mode = String(formData.get('mode') || 'login');
     setAuthMessage('Validando admin...');
     try {
-      const nextAccount = await fetch(`${API_URL}/api/auth/login`, {
+      const nextAccount = await fetch(`${API_URL}/api/auth/${mode}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          role: 'admin',
+          name: String(formData.get('name') || formData.get('email') || 'Admin'),
           email: String(formData.get('email') || '').trim().toLowerCase(),
           password: String(formData.get('password') || ''),
         }),
@@ -128,9 +131,9 @@ export default function AdminPromosPage() {
       }
       saveAccount(nextAccount);
       setAccount(nextAccount);
-      setAuthMessage('Admin conectado.');
+      setAuthMessage(mode === 'register' ? 'Admin creado y conectado.' : 'Admin conectado.');
     } catch {
-      setAuthMessage('No se pudo iniciar sesion como admin.');
+      setAuthMessage('No se pudo acceder como admin. Si ya existe la cuenta, usa Login.');
     }
   }
 
@@ -343,7 +346,7 @@ export default function AdminPromosPage() {
         </section>
 
         {(!account || account.role !== 'admin') && (
-          <AdminLogin loginAdmin={loginAdmin} message={authMessage} />
+          <AdminLogin authenticateAdmin={authenticateAdmin} message={authMessage} />
         )}
 
         {account?.role === 'admin' && (
@@ -594,15 +597,21 @@ export default function AdminPromosPage() {
   );
 }
 
-function AdminLogin({ loginAdmin, message }: { loginAdmin: (formData: FormData) => void | Promise<void>; message: string }) {
+function AdminLogin({ authenticateAdmin, message }: { authenticateAdmin: (formData: FormData) => void | Promise<void>; message: string }) {
+  const [mode, setMode] = useState<'login' | 'register'>('login');
   return (
     <section className="glass-panel rounded-lg p-5">
-      <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Admin login</p>
+      <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Admin access</p>
       <h2 className="mt-1 text-3xl font-black">Panel cerrado para administracion.</h2>
-      <form action={loginAdmin} className="mt-6 grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+      <form action={authenticateAdmin} className="mt-6 grid gap-3 md:grid-cols-[0.7fr_1fr_1fr_auto]">
+        <select name="mode" value={mode} onChange={(event) => setMode(event.target.value as 'login' | 'register')} className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300">
+          <option value="login">Login</option>
+          <option value="register">Registro</option>
+        </select>
+        {mode === 'register' && <input name="name" placeholder="Nombre admin" className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300 md:col-span-3" required />}
         <input name="email" type="email" placeholder="Email admin" className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" required />
         <input name="password" type="password" placeholder="Password" className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" required />
-        <button type="submit" className="h-12 rounded-md bg-white px-5 font-black text-slate-950">Entrar</button>
+        <button type="submit" className="h-12 rounded-md bg-white px-5 font-black text-slate-950">{mode === 'register' ? 'Crear admin' : 'Entrar'}</button>
       </form>
       {message && <p className="mt-4 rounded-md bg-white/10 p-3 text-sm text-slate-200">{message}</p>}
     </section>

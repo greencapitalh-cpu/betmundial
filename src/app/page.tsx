@@ -1,11 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
 import { useLocale, type Locale } from '@/components/LocaleProvider';
-import { saveAccount, type Account } from '@/lib/account';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bet2back-production.up.railway.app';
 
 const copy: Record<Locale, {
   kicker: string;
@@ -78,53 +74,6 @@ const cards = [
 export default function PortalPage() {
   const { locale } = useLocale();
   const t = copy[locale];
-  const [registerRole, setRegisterRole] = useState<'fan' | 'merchant' | 'admin'>('fan');
-  const [registerMessage, setRegisterMessage] = useState('');
-  const [loginMessage, setLoginMessage] = useState('');
-  const [loggedAccount, setLoggedAccount] = useState<Account | null>(null);
-
-  async function registerAccount(formData: FormData) {
-    const payload = {
-      role: registerRole,
-      name: String(formData.get('name') || ''),
-      email: String(formData.get('email') || ''),
-      password: String(formData.get('password') || ''),
-      city: String(formData.get('city') || ''),
-      merchant_name: String(formData.get('merchant_name') || ''),
-    };
-    const response = await fetch(`${API_URL}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      setRegisterMessage(error.next === 'login' ? 'Esa cuenta ya existe. Ahora entra desde Login.' : 'No se pudo crear la cuenta. Revisa los datos.');
-      return;
-    }
-    const account = await response.json();
-    setRegisterMessage(`Cuenta ${account.role} creada. Ahora inicia sesion para entrar a ${account.access_path}.`);
-    setLoginMessage('Cuenta creada. Usa el mismo email y password para iniciar sesion.');
-  }
-
-  async function loginAccount(formData: FormData) {
-    const response = await fetch(`${API_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: String(formData.get('email') || ''),
-        password: String(formData.get('password') || ''),
-      }),
-    });
-    if (!response.ok) {
-      setLoginMessage('No se pudo iniciar sesion. Primero crea la cuenta o revisa email/password.');
-      return;
-    }
-    const account = await response.json() as Account;
-    saveAccount(account);
-    setLoggedAccount(account);
-    setLoginMessage(`Sesion iniciada como ${account.role}.`);
-  }
 
   return (
     <div className="stadium-surface min-h-screen text-white">
@@ -142,47 +91,6 @@ export default function PortalPage() {
           </div>
 
           <div className="grid gap-4">
-            <div className="grid gap-4 xl:grid-cols-2">
-              <section className="glass-panel rounded-lg p-5">
-                <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">1. Crear cuenta</p>
-                <h2 className="mt-1 text-2xl font-black">Registro por tipo de usuario</h2>
-                <p className="mt-2 text-sm text-slate-300">Esto crea la cuenta en la DB con rol, ciudad y acceso asignado.</p>
-                <form action={registerAccount} className="mt-4 grid gap-3">
-                  <div className="grid grid-cols-3 gap-2">
-                    {(['fan', 'merchant', 'admin'] as const).map((role) => (
-                      <button key={role} type="button" onClick={() => setRegisterRole(role)} className={`h-10 rounded-md text-sm font-black ${registerRole === role ? 'bg-white text-slate-950' : 'bg-white/10 text-slate-200'}`}>
-                        {role}
-                      </button>
-                    ))}
-                  </div>
-                  <AuthField name="name" placeholder="Nombre responsable" />
-                  {registerRole === 'merchant' && <AuthField name="merchant_name" placeholder="Nombre del local" />}
-                  <AuthField name="city" placeholder="Ciudad o mercado" />
-                  <AuthField name="email" placeholder="Email" type="email" />
-                  <AuthField name="password" placeholder="Password minimo 6 caracteres" type="password" />
-                  <button className="fantasy-button h-11 rounded-md font-black" type="submit">Crear cuenta</button>
-                  {registerMessage && <p className="rounded-md bg-white/10 p-3 text-sm text-slate-200">{registerMessage}</p>}
-                </form>
-              </section>
-
-              <section className="glass-panel rounded-lg p-5">
-                <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-300">2. Login</p>
-                <h2 className="mt-1 text-2xl font-black">Entrar con cuenta existente</h2>
-                <p className="mt-2 text-sm text-slate-300">Login no crea usuarios: valida email/password y abre el panel segun el rol guardado.</p>
-                <form action={loginAccount} className="mt-4 grid gap-3">
-                  <AuthField name="email" placeholder="Email" type="email" />
-                  <AuthField name="password" placeholder="Password" type="password" />
-                  <button className="h-11 rounded-md bg-white font-black text-slate-950" type="submit">Iniciar sesion</button>
-                  {loginMessage && <p className="rounded-md bg-white/10 p-3 text-sm text-slate-200">{loginMessage}</p>}
-                  {loggedAccount?.access_path && (
-                    <Link href={loggedAccount.access_path} className="rounded-md bg-amber-300 px-4 py-3 text-center text-sm font-black text-slate-950">
-                      Ir a {loggedAccount.label || loggedAccount.role}
-                    </Link>
-                  )}
-                </form>
-              </section>
-            </div>
-
             {cards.map((card) => (
               <Link key={card.key} href={card.href} className="promo-ticket role-card group block rounded-lg p-1 transition hover:border-amber-300/70">
                 <div className={`h-2 rounded-t-md bg-gradient-to-r ${card.tone}`} />
@@ -201,18 +109,6 @@ export default function PortalPage() {
         </div>
       </section>
     </div>
-  );
-}
-
-function AuthField({ name, placeholder, type = 'text' }: { name: string; placeholder: string; type?: string }) {
-  return (
-    <input
-      name={name}
-      type={type}
-      placeholder={placeholder}
-      className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300"
-      required
-    />
   );
 }
 

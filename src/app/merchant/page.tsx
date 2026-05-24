@@ -310,13 +310,8 @@ export default function MerchantVerifyPage() {
           </div>
         </section>
 
-        {(!account || account.role !== 'merchant') && (
-          <MerchantAuthGate authenticateMerchant={authenticateMerchant} message={authMessage} />
-        )}
-
-        {account?.role === 'merchant' && (
+        {account?.role === 'merchant' ? (
         <>
-
         <section id="rewards" className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <div className="glass-panel rounded-lg p-5">
             <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Local rewards</p>
@@ -426,6 +421,10 @@ export default function MerchantVerifyPage() {
             </div>
           </div>
         </section>
+        </>
+        ) : (
+          <MerchantAuthGate authenticateMerchant={authenticateMerchant} message={authMessage} />
+        )}
 
         <section id="verify" className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
         <section className="glass-panel rounded-lg p-5">
@@ -495,8 +494,6 @@ export default function MerchantVerifyPage() {
           )}
         </section>
         </section>
-        </>
-        )}
       </div>
     </div>
   );
@@ -506,8 +503,8 @@ function MerchantAuthGate({ authenticateMerchant, message }: { authenticateMerch
   return (
     <section className="glass-panel rounded-lg p-5">
       <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Acceso de empresa</p>
-      <h2 className="mt-1 text-3xl font-black">Entra para crear campanas y verificar vales.</h2>
-      <p className="mt-2 text-sm leading-6 text-slate-300">Cada premio o publicidad queda pendiente hasta que admin revise que la promo sea real.</p>
+      <h2 className="mt-1 text-3xl font-black">Entra para crear campañas.</h2>
+      <p className="mt-2 text-sm leading-6 text-slate-300">Puedes verificar vales sin cuenta. Para subir premios o publicidad del local, crea cuenta o inicia sesion.</p>
       <form action={authenticateMerchant} className="mt-6 grid gap-3 md:grid-cols-2 lg:grid-cols-[0.7fr_1fr_1fr_1fr_1fr_auto]">
         <select name="mode" className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300">
           <option value="login">Login</option>
