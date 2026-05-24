@@ -15,8 +15,26 @@ type MerchantPromo = {
   rule: string;
 };
 
+type Match = {
+  id: number;
+  group_name: string;
+  phase: string;
+  match_date: string;
+  city: string;
+  venue: string;
+  home_team: string;
+  away_team: string;
+  home_code: string;
+  away_code: string;
+  home_score: number | null;
+  away_score: number | null;
+  status: string;
+};
+
 export default function AdminPromosPage() {
   const [promos, setPromos] = useState<MerchantPromo[]>(demoMerchants);
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [resultMessage, setResultMessage] = useState('');
 
   useEffect(() => {
     fetch(`${API_URL}/api/merchant-promotions`)
@@ -30,6 +48,11 @@ export default function AdminPromosPage() {
         offer: String(row.description || ''),
         rule: 'Por visitar',
       }))))
+      .catch(() => undefined);
+
+    fetch(`${API_URL}/api/matches`)
+      .then((response) => response.ok ? response.json() : Promise.reject())
+      .then((rows) => setMatches(rows))
       .catch(() => undefined);
   }, []);
 
@@ -85,6 +108,38 @@ export default function AdminPromosPage() {
     setPromos((current) => [{ ...merchantPayload, image, offer: String(formData.get('offer') || 'Promo especial'), rule: String(formData.get('rule') || 'Participar') }, ...current]);
   }
 
+  async function publishResult(formData: FormData) {
+    const matchId = Number(formData.get('match_id'));
+    const homeScore = Number(formData.get('home_score'));
+    const awayScore = Number(formData.get('away_score'));
+    const firstHalfHome = formData.get('first_half_home_score');
+    const firstHalfAway = formData.get('first_half_away_score');
+
+    setResultMessage('Saving result and checking vouchers...');
+    const response = await fetch(`${API_URL}/api/matches/${matchId}/result`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        home_score: homeScore,
+        away_score: awayScore,
+        first_half_home_score: firstHalfHome === '' ? null : Number(firstHalfHome),
+        first_half_away_score: firstHalfAway === '' ? null : Number(firstHalfAway),
+      }),
+    });
+
+    if (!response.ok) {
+      setResultMessage('Could not save result. Please try again.');
+      return;
+    }
+
+    setMatches((current) => current.map((match) => (
+      match.id === matchId
+        ? { ...match, home_score: homeScore, away_score: awayScore, status: 'final' }
+        : match
+    )));
+    setResultMessage('Result saved. Matching vouchers were issued automatically.');
+  }
+
   return (
     <div className="stadium-surface min-h-screen px-4 py-10 text-white">
       <div className="mx-auto grid max-w-7xl gap-6">
@@ -101,6 +156,59 @@ export default function AdminPromosPage() {
               <AdminStat value={String(promos.length)} label="locales" />
               <AdminStat value="Ads" label="cinta" />
               <AdminStat value="Links" label="redes" />
+            </div>
+          </div>
+        </section>
+
+        <section id="results" className="glass-panel rounded-lg p-5">
+          <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Match results</p>
+              <h2 className="mt-1 text-3xl font-black">Load final score and award vouchers</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                When a result is saved, the backend compares every prediction against active merchant rules and creates the valid voucher codes.
+              </p>
+              <form action={publishResult} className="mt-6 grid gap-4">
+                <label className="grid gap-2 text-sm font-semibold text-slate-300">
+                  Match
+                  <select name="match_id" className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300">
+                    {matches.slice(0, 104).map((match) => (
+                      <option key={match.id} value={match.id}>
+                        M{match.id} · {match.group_name || match.phase} · {match.home_code} {match.home_team} vs {match.away_code} {match.away_team}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Field name="home_score" label="Home final score" placeholder="2" type="number" />
+                  <Field name="away_score" label="Away final score" placeholder="1" type="number" />
+                  <OptionalField name="first_half_home_score" label="Home 1st half" placeholder="1" />
+                  <OptionalField name="first_half_away_score" label="Away 1st half" placeholder="0" />
+                </div>
+                <button className="fantasy-button h-12 rounded-md font-black transition">Save result and issue vouchers</button>
+                {resultMessage && <p className="rounded-md bg-white/10 p-3 text-sm text-slate-200">{resultMessage}</p>}
+              </form>
+            </div>
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-300">Recently finalized</p>
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                {matches.filter((match) => match.status === 'final').slice(0, 6).map((match) => (
+                  <article key={match.id} className="fixture-card rounded-lg border border-white/10 p-4">
+                    <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">M{match.id} · {match.city}</p>
+                    <div className="mt-3 grid grid-cols-[1fr_auto] gap-3 text-sm">
+                      <strong>{match.home_code} {match.home_team}</strong>
+                      <strong className="text-amber-300">{match.home_score}</strong>
+                      <strong>{match.away_code} {match.away_team}</strong>
+                      <strong className="text-amber-300">{match.away_score}</strong>
+                    </div>
+                  </article>
+                ))}
+                {matches.filter((match) => match.status === 'final').length === 0 && (
+                  <div className="rounded-lg border border-dashed border-white/15 p-6 text-sm text-slate-300">
+                    No finalized matches yet.
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>
@@ -169,11 +277,20 @@ function AdminStat({ value, label }: { value: string; label: string }) {
   );
 }
 
-function Field({ name, label, placeholder }: { name: string; label: string; placeholder: string }) {
+function Field({ name, label, placeholder, type = 'text' }: { name: string; label: string; placeholder: string; type?: string }) {
   return (
     <label className="grid gap-2 text-sm font-semibold text-slate-300">
       {label}
-      <input name={name} placeholder={placeholder} className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" required />
+      <input name={name} type={type} min={type === 'number' ? 0 : undefined} placeholder={placeholder} className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" required />
+    </label>
+  );
+}
+
+function OptionalField({ name, label, placeholder }: { name: string; label: string; placeholder: string }) {
+  return (
+    <label className="grid gap-2 text-sm font-semibold text-slate-300">
+      {label}
+      <input name={name} type="number" min={0} placeholder={placeholder} className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" />
     </label>
   );
 }
