@@ -683,6 +683,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <SponsorRibbon coupons={coupons} setTab={setTab} />
+
       <main className="mx-auto max-w-7xl px-4 py-8">
         <div className="tab-strip sticky top-[65px] z-30 mb-6 grid grid-cols-2 gap-2 rounded-lg border border-white/10 p-2 backdrop-blur-xl md:grid-cols-5">
           {(['matches', 'bracket', 'predictions', 'vouchers', 'promos'] as Tab[]).map((item) => (
@@ -896,6 +898,36 @@ function SocialLinks({ links, label }: { links: string[]; label: string }) {
         </a>
       ))}
     </div>
+  );
+}
+
+function SponsorRibbon({ coupons, setTab }: { coupons: Coupon[]; setTab: (tab: Tab) => void }) {
+  const items = coupons.length > 0 ? coupons : couponsSeed;
+  const ribbonItems = [...items, ...items].slice(0, Math.max(8, items.length * 2));
+  return (
+    <section className="border-y border-white/10 bg-slate-950/80 py-3">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="sponsor-marquee overflow-hidden">
+          <div className="sponsor-item flex w-max gap-3">
+            {ribbonItems.map((coupon, index) => (
+              <button
+                key={`${coupon.id}-${index}`}
+                type="button"
+                onClick={() => setTab('promos')}
+                className="flex h-20 w-[300px] items-center gap-3 rounded-lg border border-white/10 bg-white/10 p-2 text-left transition hover:border-amber-300/60"
+              >
+                <img src={coupon.image} alt={coupon.merchant} className="h-14 w-16 rounded-md object-cover" />
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-black text-white">{coupon.merchant}</span>
+                  <span className="block truncate text-xs text-amber-200">{coupon.offer}</span>
+                  <span className="block truncate text-xs text-slate-400">{coupon.city || coupon.zone}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
