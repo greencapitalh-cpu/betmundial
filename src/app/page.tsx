@@ -78,16 +78,21 @@ export default function PortalPage() {
   return (
     <div className="stadium-surface min-h-screen text-white">
       <section className="world-hero-bg border-b border-white/10">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 lg:grid-cols-[0.85fr_1.15fr] lg:py-20">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 lg:min-h-[calc(100vh-73px)] lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:py-20">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.28em] text-amber-300">{t.kicker}</p>
             <h1 className="mt-4 max-w-3xl text-4xl font-black leading-tight md:text-6xl">{t.title}</h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">{t.body}</p>
+            <div className="mt-8 grid max-w-xl grid-cols-3 gap-3">
+              <Stat value="104" label="matches" />
+              <Stat value="3" label="frontends" />
+              <Stat value="QR" label="vouchers" />
+            </div>
           </div>
 
           <div className="grid gap-4">
             {cards.map((card) => (
-              <Link key={card.key} href={card.href} className="promo-ticket group block rounded-lg p-1 transition hover:border-amber-300/70">
+              <Link key={card.key} href={card.href} className="promo-ticket role-card group block rounded-lg p-1 transition hover:border-amber-300/70">
                 <div className={`h-2 rounded-t-md bg-gradient-to-r ${card.tone}`} />
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-4">
@@ -103,6 +108,15 @@ export default function PortalPage() {
           </div>
         </div>
       </section>
+    </div>
+  );
+}
+
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/10 p-3">
+      <strong className="block text-2xl font-black text-amber-300">{value}</strong>
+      <span className="text-xs uppercase tracking-[0.18em] text-slate-400">{label}</span>
     </div>
   );
 }

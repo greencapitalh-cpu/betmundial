@@ -71,7 +71,25 @@ export default function AdminPromosPage() {
 
   return (
     <div className="stadium-surface min-h-screen px-4 py-10 text-white">
-      <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+      <div className="mx-auto grid max-w-7xl gap-6">
+        <section className="glass-panel rounded-lg p-5 md:p-7">
+          <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Admin control room</p>
+              <h1 className="mt-2 max-w-3xl text-4xl font-black leading-tight md:text-5xl">Publica locales, banners y campanas sin mezclar flujos.</h1>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+                Este panel queda separado del fan y del local: administra comercios, imagenes, zonas, links y promociones visibles en la app.
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-3 lg:w-[360px]">
+              <AdminStat value={String(promos.length)} label="locales" />
+              <AdminStat value="Ads" label="cinta" />
+              <AdminStat value="Links" label="redes" />
+            </div>
+          </div>
+        </section>
+
+        <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <section id="publish" className="glass-panel rounded-lg p-5">
           <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Admin publisher</p>
           <h1 className="mt-1 text-3xl font-black">Publish local promotions</h1>
@@ -120,7 +138,17 @@ export default function AdminPromosPage() {
             ))}
           </div>
         </section>
+        </div>
       </div>
+    </div>
+  );
+}
+
+function AdminStat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/10 p-3 text-center">
+      <strong className="block text-2xl font-black text-amber-300">{value}</strong>
+      <span className="text-[11px] uppercase tracking-[0.16em] text-slate-400">{label}</span>
     </div>
   );
 }

@@ -661,12 +661,12 @@ export default function HomePage() {
       </section>
 
       <main className="mx-auto max-w-7xl px-4 py-8">
-        <div className="mb-6 grid grid-cols-2 gap-2 rounded-lg border border-white/10 bg-white/10 p-2 md:grid-cols-5">
+        <div className="tab-strip sticky top-[65px] z-30 mb-6 grid grid-cols-2 gap-2 rounded-lg border border-white/10 p-2 backdrop-blur-xl md:grid-cols-5">
           {(['matches', 'bracket', 'predictions', 'vouchers', 'promos'] as Tab[]).map((item) => (
             <button
               key={item}
               onClick={() => setTab(item)}
-              className={`h-12 rounded-md text-sm font-black transition ${tab === item ? 'bg-amber-300 text-slate-950' : 'text-slate-200 hover:bg-white/10'}`}
+              className={`h-12 rounded-md text-sm font-black transition ${tab === item ? 'bg-amber-300 text-slate-950 shadow-[0_10px_28px_rgba(247,201,72,0.18)]' : 'text-slate-200 hover:bg-white/10'}`}
               type="button"
             >
               {t[item]}
@@ -942,8 +942,8 @@ function KnockoutBracket({
   return (
     <section className="glass-panel rounded-lg p-5">
       <SectionTitle title={t.bracket} helper={t.bracketHelper} />
-      <div className="mt-6 overflow-x-auto pb-3">
-        <div className="grid min-w-[1180px] grid-cols-[1.1fr_1fr_0.95fr_0.9fr_1.1fr_0.9fr_0.95fr_1fr_1.1fr] gap-3">
+      <div className="bracket-board mt-6 overflow-x-auto rounded-lg border border-white/10 p-4 pb-5">
+        <div className="grid min-w-[1180px] grid-cols-[1.1fr_1fr_0.95fr_0.9fr_1.1fr_0.9fr_0.95fr_1fr_1.1fr] gap-4">
           <BracketColumn title="Round of 32" matches={round32.slice(0, 8)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} />
           <BracketColumn title="Round of 16" matches={r16.slice(0, 4)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced />
           <BracketColumn title="Quarter-finals" matches={qf.slice(0, 2)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced />
@@ -958,10 +958,10 @@ function KnockoutBracket({
               </div>
             )}
           </div>
-          <BracketColumn title="Semi-finals" matches={sf.slice(1, 2)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} center />
-          <BracketColumn title="Quarter-finals" matches={qf.slice(2, 4)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced />
-          <BracketColumn title="Round of 16" matches={r16.slice(4, 8)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced />
-          <BracketColumn title="Round of 32" matches={round32.slice(8, 16)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} />
+          <BracketColumn title="Semi-finals" matches={sf.slice(1, 2)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} center reverse />
+          <BracketColumn title="Quarter-finals" matches={qf.slice(2, 4)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced reverse />
+          <BracketColumn title="Round of 16" matches={r16.slice(4, 8)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced reverse />
+          <BracketColumn title="Round of 32" matches={round32.slice(8, 16)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} reverse />
         </div>
       </div>
     </section>
@@ -976,6 +976,7 @@ function BracketColumn({
   locale,
   spaced = false,
   center = false,
+  reverse = false,
 }: {
   title: string;
   matches: Match[];
@@ -984,12 +985,20 @@ function BracketColumn({
   locale: Locale;
   spaced?: boolean;
   center?: boolean;
+  reverse?: boolean;
 }) {
   return (
     <div className={`grid gap-3 ${spaced ? 'content-around' : 'content-start'} ${center ? 'content-center' : ''}`}>
       <p className="text-center text-xs font-black uppercase tracking-[0.2em] text-amber-300">{title}</p>
       {matches.map((match) => (
-        <BracketMatch key={match.id} match={match} selected={selectedMatchId === match.id} setSelectedMatchId={setSelectedMatchId} locale={locale} />
+        <BracketMatch
+          key={match.id}
+          match={match}
+          selected={selectedMatchId === match.id}
+          setSelectedMatchId={setSelectedMatchId}
+          locale={locale}
+          reverse={reverse}
+        />
       ))}
     </div>
   );
@@ -1001,12 +1010,14 @@ function BracketMatch({
   setSelectedMatchId,
   locale,
   featured = false,
+  reverse = false,
 }: {
   match: Match;
   selected: boolean;
   setSelectedMatchId: (id: number) => void;
   locale: Locale;
   featured?: boolean;
+  reverse?: boolean;
 }) {
   const schedule = formatMatchSchedule(match, locale);
   const winner = matchWinner(match);
@@ -1014,7 +1025,7 @@ function BracketMatch({
     <button
       type="button"
       onClick={() => setSelectedMatchId(match.id)}
-      className={`fixture-card w-full rounded-lg border p-3 text-left transition ${selected ? 'border-amber-300' : 'border-white/10 hover:border-amber-300/60'} ${featured ? 'bg-amber-300/10' : ''}`}
+      className={`fixture-card bracket-match ${reverse ? 'bracket-match-left' : ''} relative w-full rounded-lg border p-3 text-left transition ${selected ? 'border-amber-300 shadow-[0_0_0_1px_rgba(247,201,72,0.35),0_18px_38px_rgba(247,201,72,0.12)]' : 'border-white/10 hover:border-amber-300/60'} ${featured ? 'bg-amber-300/10' : ''}`}
     >
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="text-xs font-black text-slate-400">M{match.id}</span>

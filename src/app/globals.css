@@ -21,6 +21,11 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
+::selection {
+  background: rgba(247, 201, 72, 0.35);
+  color: #ffffff;
+}
+
 .world-hero-bg {
   background-image:
     linear-gradient(90deg, rgba(5, 9, 20, 0.98) 0%, rgba(5, 9, 20, 0.8) 42%, rgba(5, 9, 20, 0.22) 100%),
@@ -39,7 +44,9 @@ body {
 
 .glass-panel {
   border: 1px solid rgba(255, 255, 255, 0.16);
-  background: linear-gradient(145deg, rgba(9, 20, 44, 0.88), rgba(16, 24, 46, 0.7));
+  background:
+    linear-gradient(145deg, rgba(9, 20, 44, 0.92), rgba(16, 24, 46, 0.74)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 42%);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
   backdrop-filter: blur(18px);
 }
@@ -103,6 +110,22 @@ body {
     #0b1430;
 }
 
+.role-card {
+  min-height: 150px;
+}
+
+.role-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 52px rgba(0, 0, 0, 0.32);
+}
+
+.role-card:focus-visible,
+.fixture-card:focus-visible,
+.fantasy-button:focus-visible {
+  outline: 3px solid rgba(247, 201, 72, 0.72);
+  outline-offset: 3px;
+}
+
 .promo-ticket::before,
 .promo-ticket::after {
   content: "";
@@ -122,6 +145,41 @@ body {
   background:
     linear-gradient(135deg, rgba(0, 229, 160, 0.1), rgba(255, 255, 255, 0.03)),
     #09162f;
+}
+
+.fixture-card:hover {
+  background:
+    linear-gradient(135deg, rgba(0, 229, 160, 0.16), rgba(247, 201, 72, 0.06)),
+    #0a1936;
+}
+
+.bracket-board {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    rgba(3, 8, 20, 0.34);
+  background-size: 56px 56px;
+}
+
+.bracket-match::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -13px;
+  width: 13px;
+  height: 1px;
+  background: rgba(247, 201, 72, 0.32);
+}
+
+.bracket-match-left::after {
+  left: -13px;
+  right: auto;
+}
+
+.tab-strip {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(255, 255, 255, 0.06);
 }
 
 .fantasy-button {

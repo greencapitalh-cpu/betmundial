@@ -196,6 +196,23 @@ export default function MerchantVerifyPage() {
   return (
     <div className="stadium-surface min-h-screen px-4 py-10 text-white">
       <div className="mx-auto grid max-w-7xl gap-6">
+        <section className="glass-panel overflow-hidden rounded-lg p-5 md:p-7">
+          <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Merchant cockpit</p>
+              <h1 className="mt-2 max-w-3xl text-4xl font-black leading-tight md:text-5xl">Premios, promos y validacion QR en un solo panel.</h1>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+                El local publica beneficios por acierto, carga promos abiertas por visita y verifica cada vale con codigo o QR en el punto de venta.
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-3 lg:w-[360px]">
+              <MerchantStat value={String(rewards.length)} label="premios" />
+              <MerchantStat value={String(visitPromos.length)} label="promos" />
+              <MerchantStat value={usedCodes.length ? String(usedCodes.length) : 'QR'} label="canje" />
+            </div>
+          </div>
+        </section>
+
         <section id="rewards" className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <div className="glass-panel rounded-lg p-5">
             <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Local rewards</p>
@@ -374,6 +391,15 @@ function ruleLabel(rule: RewardRule) {
     participate: 'Participar',
   };
   return labels[rule];
+}
+
+function MerchantStat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/10 p-3 text-center">
+      <strong className="block text-2xl font-black text-amber-300">{value}</strong>
+      <span className="text-[11px] uppercase tracking-[0.16em] text-slate-400">{label}</span>
+    </div>
+  );
 }
 
 function Field({ name, label, placeholder, type = 'text' }: { name: string; label: string; placeholder: string; type?: string }) {
