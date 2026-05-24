@@ -81,6 +81,11 @@ type Voucher = {
   away_code: string;
 };
 
+type OAuthStatus = {
+  google: boolean;
+  facebook: boolean;
+};
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bet2back-production.up.railway.app';
 
 const matchesSeed: Match[] = [
@@ -522,9 +527,16 @@ export default function HomePage() {
   const [deviceId, setDeviceId] = useState('');
   const [account, setAccount] = useState<Account | null>(null);
   const [authMessage, setAuthMessage] = useState('');
+  const [oauthStatus, setOauthStatus] = useState<OAuthStatus>({ google: false, facebook: false });
 
   useEffect(() => {
     setAccount(readAccount());
+    const authError = new URLSearchParams(window.location.search).get('auth_error');
+    if (authError) {
+      setAuthMessage(authError.includes('not_configured')
+        ? 'Google/Facebook OAuth todavia no tiene credenciales configuradas en Railway.'
+        : 'No se pudo completar el acceso social. Proba con email/password.');
+    }
     const saved = window.localStorage.getItem('golazo-device-id');
     if (saved) {
       setDeviceId(saved);
@@ -549,6 +561,9 @@ export default function HomePage() {
     apiFetch<Record<string, unknown>[]>('/api/merchant-rewards')
       .then((rows) => setCoupons(rows.map(mapReward)))
       .catch(() => undefined);
+    apiFetch<OAuthStatus>('/api/auth/oauth/status')
+      .then(setOauthStatus)
+      .catch(() => setOauthStatus({ google: false, facebook: false }));
   }, []);
 
   useEffect(() => {
@@ -724,7 +739,7 @@ export default function HomePage() {
     <div className="stadium-surface min-h-screen text-white">
       <section className="world-hero-bg relative overflow-hidden border-b border-white/10">
         <div className="trophy-silhouette hidden md:block" aria-hidden="true" />
-        <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-12 lg:grid-cols-[1.05fr_0.95fr] lg:py-16">
+        <div className="relative mx-auto max-w-7xl px-4 py-12 lg:py-16">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.28em] text-amber-300">{t.kicker}</p>
             <h1 className="mt-4 max-w-3xl text-4xl font-black leading-tight md:text-6xl">{t.title}</h1>
@@ -735,7 +750,6 @@ export default function HomePage() {
               <Pill label={`${vouchers.length || localVouchers.length} ${t.vouchers}`} />
             </div>
           </div>
-          <MatchHero match={selectedMatch} locale={locale} t={t} />
         </div>
       </section>
 
@@ -837,6 +851,7 @@ export default function HomePage() {
               existingPrediction={selectedPrediction}
               account={account}
               authMessage={authMessage}
+              oauthStatus={oauthStatus}
               authenticateFan={authenticateFan}
             />
           </section>
@@ -1017,6 +1032,7 @@ function PredictionPanel({
   existingPrediction,
   account,
   authMessage,
+  oauthStatus,
   authenticateFan,
 }: {
   id?: string;
@@ -1030,6 +1046,7 @@ function PredictionPanel({
   existingPrediction?: Prediction;
   account: Account | null;
   authMessage: string;
+  oauthStatus: OAuthStatus;
   authenticateFan: (formData: FormData) => void | Promise<void>;
 }) {
   const [homeScore, setHomeScore] = useState(0);
@@ -1055,7 +1072,7 @@ function PredictionPanel({
         </p>
       )}
       {(!account || account.role !== 'fan') && (
-        <FanAuthGate authenticateFan={authenticateFan} message={authMessage} />
+        <FanAuthGate authenticateFan={authenticateFan} message={authMessage} oauthStatus={oauthStatus} />
       )}
       <form action={savePrediction} className="mt-5 grid gap-4">
         <input type="hidden" name="matchId" value={match.id} />
@@ -1099,19 +1116,42 @@ function PredictionPanel({
   );
 }
 
-function FanAuthGate({ authenticateFan, message }: { authenticateFan: (formData: FormData) => void | Promise<void>; message: string }) {
+function FanAuthGate({
+  authenticateFan,
+  message,
+  oauthStatus,
+}: {
+  authenticateFan: (formData: FormData) => void | Promise<void>;
+  message: string;
+  oauthStatus: OAuthStatus;
+}) {
   return (
     <div className="mt-5 rounded-lg border border-amber-300/25 bg-slate-950/75 p-4">
       <p className="text-sm font-black uppercase tracking-[0.18em] text-amber-300">Registro para guardar</p>
       <p className="mt-2 text-sm text-slate-300">Puedes mirar fixture y promos libremente. Para guardar tu marcador necesitamos identificarte.</p>
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
-        <a href={`${API_URL}/api/auth/oauth/google/start`} className="h-11 rounded-md bg-white px-4 py-3 text-center text-sm font-black text-slate-950">
-          Continue with Google
-        </a>
-        <a href={`${API_URL}/api/auth/oauth/facebook/start`} className="h-11 rounded-md bg-[#1877f2] px-4 py-3 text-center text-sm font-black text-white">
-          Continue with Facebook
-        </a>
+        {oauthStatus.google ? (
+          <a href={`${API_URL}/api/auth/oauth/google/start`} className="h-11 rounded-md bg-white px-4 py-3 text-center text-sm font-black text-slate-950">
+            Continue with Google
+          </a>
+        ) : (
+          <button type="button" disabled className="h-11 cursor-not-allowed rounded-md bg-white/30 px-4 text-center text-sm font-black text-slate-300">
+            Google pendiente
+          </button>
+        )}
+        {oauthStatus.facebook ? (
+          <a href={`${API_URL}/api/auth/oauth/facebook/start`} className="h-11 rounded-md bg-[#1877f2] px-4 py-3 text-center text-sm font-black text-white">
+            Continue with Facebook
+          </a>
+        ) : (
+          <button type="button" disabled className="h-11 cursor-not-allowed rounded-md bg-[#1877f2]/40 px-4 text-center text-sm font-black text-slate-200">
+            Facebook pendiente
+          </button>
+        )}
       </div>
+      {(!oauthStatus.google || !oauthStatus.facebook) && (
+        <p className="mt-2 text-xs text-slate-400">Para activar acceso social faltan credenciales OAuth en Railway.</p>
+      )}
       <form action={authenticateFan} className="mt-4 grid gap-3 md:grid-cols-[0.75fr_1fr_1fr_auto]">
         <select name="mode" className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300">
           <option value="login">Login</option>
