@@ -7,6 +7,9 @@ export type Account = {
   email: string;
   city?: string;
   merchant_id?: number | null;
+  access_path?: string;
+  label?: string;
+  permissions?: string[];
   token?: string;
 };
 
