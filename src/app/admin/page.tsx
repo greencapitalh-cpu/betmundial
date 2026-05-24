@@ -33,8 +33,24 @@ export default function AdminPromosPage() {
       .catch(() => undefined);
   }, []);
 
+  async function uploadImage(formData: FormData) {
+    const file = formData.get('image');
+    if (!(file instanceof File) || file.size === 0) return '/world-cup-abstract-bg.png';
+
+    const uploadData = new FormData();
+    uploadData.append('image', file);
+    uploadData.append('folder', 'admin-promotions');
+    const response = await fetch(`${API_URL}/api/uploads/images`, {
+      method: 'POST',
+      body: uploadData,
+    });
+    if (!response.ok) throw new Error('Image upload failed');
+    const payload = await response.json();
+    return String(payload.url || '/world-cup-abstract-bg.png');
+  }
+
   async function addPromo(formData: FormData) {
-    const image = String(formData.get('image_url') || '/world-cup-abstract-bg.png');
+    const image = await uploadImage(formData).catch(() => '/world-cup-abstract-bg.png');
     const merchantPayload = {
       name: String(formData.get('name') || 'Local aliado'),
       zone: String(formData.get('zone') || 'Zona mundialista'),
@@ -103,7 +119,7 @@ export default function AdminPromosPage() {
             <Field name="zone" label="Zone" placeholder="Azteca / Tlalpan" />
             <Field name="address" label="Text address" placeholder="Street, number, city" />
             <Field name="link" label="Social, page, or Maps link" placeholder="https://instagram.com/local" />
-            <Field name="image_url" label="Image URL" placeholder="https://..." />
+            <FileField label="Promotion image" />
             <Field name="expires" label="Validity" placeholder="During match days" />
             <label className="grid gap-2 text-sm font-semibold text-slate-300">
               Prize rule
@@ -158,6 +174,21 @@ function Field({ name, label, placeholder }: { name: string; label: string; plac
     <label className="grid gap-2 text-sm font-semibold text-slate-300">
       {label}
       <input name={name} placeholder={placeholder} className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" required />
+    </label>
+  );
+}
+
+function FileField({ label }: { label: string }) {
+  return (
+    <label className="grid gap-2 text-sm font-semibold text-slate-300">
+      {label}
+      <input
+        name="image"
+        type="file"
+        accept="image/png,image/jpeg,image/webp,image/gif"
+        className="rounded-md border border-dashed border-white/20 bg-slate-950 px-3 py-3 text-sm text-slate-300 file:mr-4 file:rounded-md file:border-0 file:bg-amber-300 file:px-4 file:py-2 file:text-sm file:font-black file:text-slate-950 focus:border-amber-300 focus:outline-none"
+        required
+      />
     </label>
   );
 }

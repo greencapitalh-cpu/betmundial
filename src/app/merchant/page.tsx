@@ -143,8 +143,24 @@ export default function MerchantVerifyPage() {
       .catch(() => setVerifyError('Vale no encontrado en backend. Revisa el código o usa datos demo.'));
   }
 
-  function addReward(formData: FormData) {
-    const image = String(formData.get('image_url') || '/world-cup-abstract-bg.png');
+  async function uploadImage(formData: FormData, folder: string) {
+    const file = formData.get('image');
+    if (!(file instanceof File) || file.size === 0) return '/world-cup-abstract-bg.png';
+
+    const uploadData = new FormData();
+    uploadData.append('image', file);
+    uploadData.append('folder', folder);
+    const response = await fetch(`${API_URL}/api/uploads/images`, {
+      method: 'POST',
+      body: uploadData,
+    });
+    if (!response.ok) throw new Error('Image upload failed');
+    const payload = await response.json();
+    return String(payload.url || '/world-cup-abstract-bg.png');
+  }
+
+  async function addReward(formData: FormData) {
+    const image = await uploadImage(formData, 'merchant-rewards').catch(() => '/world-cup-abstract-bg.png');
     fetch(`${API_URL}/api/merchant-rewards`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -169,8 +185,8 @@ export default function MerchantVerifyPage() {
     }, ...current]);
   }
 
-  function addVisitPromo(formData: FormData) {
-    const image = String(formData.get('image_url') || '/world-cup-abstract-bg.png');
+  async function addVisitPromo(formData: FormData) {
+    const image = await uploadImage(formData, 'merchant-promotions').catch(() => '/world-cup-abstract-bg.png');
     fetch(`${API_URL}/api/merchant-promotions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -224,7 +240,7 @@ export default function MerchantVerifyPage() {
             <form action={addReward} className="mt-6 grid gap-4">
               <Field name="title" label="Nombre de la campaña" placeholder="Noche de marcador exacto" />
               <Field name="prize" label="Premio / vale" placeholder="2x1 en entrada, bebida gratis, descuento..." />
-              <Field name="image_url" label="URL de foto del premio" placeholder="https://..." />
+              <FileField label="Foto del premio" />
               <label className="grid gap-2 text-sm font-semibold text-slate-300">
                 Tipo de acierto
                 <select name="rule" className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300">
@@ -280,7 +296,7 @@ export default function MerchantVerifyPage() {
             <form action={addVisitPromo} className="mt-6 grid gap-4">
               <Field name="title" label="Titulo de la promo" placeholder="Happy hour mundialista" />
               <Field name="description" label="En que consiste" placeholder="10% off mostrando la app" />
-              <Field name="image_url" label="URL de foto / banner" placeholder="https://..." />
+              <FileField label="Foto o banner de la promo" />
               <Field name="link" label="Link del local" placeholder="Instagram, web o Google Maps" />
               <Field name="expires" label="Vigencia" placeholder="Durante partidos" />
               <button className="fantasy-button h-12 rounded-md font-black transition">Publicar promo por visita</button>
@@ -407,6 +423,21 @@ function Field({ name, label, placeholder, type = 'text' }: { name: string; labe
     <label className="grid gap-2 text-sm font-semibold text-slate-300">
       {label}
       <input name={name} type={type} min={type === 'number' ? 1 : undefined} placeholder={placeholder} className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" required />
+    </label>
+  );
+}
+
+function FileField({ label }: { label: string }) {
+  return (
+    <label className="grid gap-2 text-sm font-semibold text-slate-300">
+      {label}
+      <input
+        name="image"
+        type="file"
+        accept="image/png,image/jpeg,image/webp,image/gif"
+        className="rounded-md border border-dashed border-white/20 bg-slate-950 px-3 py-3 text-sm text-slate-300 file:mr-4 file:rounded-md file:border-0 file:bg-amber-300 file:px-4 file:py-2 file:text-sm file:font-black file:text-slate-950 focus:border-amber-300 focus:outline-none"
+        required
+      />
     </label>
   );
 }
