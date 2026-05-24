@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import VoucherQr from '@/components/VoucherQr';
 import { demoVouchers } from '@/lib/voucherDemo';
+import { readAccount, saveAccount, type Account } from '@/lib/account';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bet2back-production.up.railway.app';
 
@@ -10,6 +11,7 @@ type RewardRule = 'winner' | 'exact' | 'goal_diff' | 'home_goals' | 'away_goals'
 
 type MerchantReward = {
   id: number;
+  merchantId?: number;
   title: string;
   prize: string;
   rule: RewardRule;
@@ -17,10 +19,12 @@ type MerchantReward = {
   expires: string;
   image: string;
   city: string;
+  reviewStatus?: string;
 };
 
 type VisitPromo = {
   id: number;
+  merchantId?: number;
   title: string;
   description: string;
   image: string;
@@ -32,6 +36,7 @@ type VisitPromo = {
   tiktok: string;
   whatsapp: string;
   expires: string;
+  reviewStatus?: string;
 };
 
 type ApiVoucher = {
@@ -66,6 +71,8 @@ export default function MerchantVerifyPage() {
   const [visitPromos, setVisitPromos] = useState<VisitPromo[]>([
     { id: 1, title: 'Happy hour mundialista', description: '10% off mostrando la app en barra.', image: '/world-cup-abstract-bg.png', link: 'https://maps.google.com', city: 'Mexico City', address: 'Zona estadio', instagram: '', facebook: '', tiktok: '', whatsapp: '', expires: 'Durante partidos' },
   ]);
+  const [account, setAccount] = useState<Account | null>(null);
+  const [authMessage, setAuthMessage] = useState('');
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const voucher = useMemo(() => {
@@ -76,12 +83,21 @@ export default function MerchantVerifyPage() {
   const isValid = voucher && effectiveStatus === 'valid';
   const displayedStatus = apiVoucher?.status || effectiveStatus;
   const displayedIsValid = apiVoucher ? apiVoucher.status === 'valid' : isValid;
+  const visibleRewards = useMemo(() => (
+    account?.merchant_id ? rewards.filter((reward) => !reward.merchantId || reward.merchantId === account.merchant_id) : rewards
+  ), [account?.merchant_id, rewards]);
+  const visiblePromos = useMemo(() => (
+    account?.merchant_id ? visitPromos.filter((promo) => !promo.merchantId || promo.merchantId === account.merchant_id) : visitPromos
+  ), [account?.merchant_id, visitPromos]);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/merchant-rewards`)
+    setAccount(readAccount());
+
+    fetch(`${API_URL}/api/merchant-rewards?include_all=1`)
       .then((response) => response.ok ? response.json() : Promise.reject())
       .then((rows) => setRewards(rows.map((row: Record<string, unknown>) => ({
         id: Number(row.id),
+        merchantId: Number(row.merchant_id || 0),
         title: String(row.title || ''),
         prize: String(row.prize || ''),
         rule: String(row.rule || 'participate') as RewardRule,
@@ -89,13 +105,15 @@ export default function MerchantVerifyPage() {
         expires: String(row.expires_at || ''),
         image: String(row.image_url || '/world-cup-abstract-bg.png'),
         city: String(row.campaign_city || row.city || row.merchant_city || ''),
+        reviewStatus: String(row.review_status || 'approved'),
       }))))
       .catch(() => undefined);
 
-    fetch(`${API_URL}/api/merchant-promotions`)
+    fetch(`${API_URL}/api/merchant-promotions?include_all=1`)
       .then((response) => response.ok ? response.json() : Promise.reject())
       .then((rows) => setVisitPromos(rows.map((row: Record<string, unknown>) => ({
         id: Number(row.id),
+        merchantId: Number(row.merchant_id || 0),
         title: String(row.title || ''),
         description: String(row.description || ''),
         image: String(row.image_url || '/world-cup-abstract-bg.png'),
@@ -107,9 +125,38 @@ export default function MerchantVerifyPage() {
         tiktok: String(row.campaign_tiktok_url || row.tiktok_url || ''),
         whatsapp: String(row.campaign_whatsapp_url || row.whatsapp_url || ''),
         expires: String(row.expires_at || ''),
+        reviewStatus: String(row.review_status || 'approved'),
       }))))
       .catch(() => undefined);
   }, []);
+
+  async function authenticateMerchant(formData: FormData) {
+    const mode = String(formData.get('mode') || 'login');
+    setAuthMessage('Conectando el local...');
+    try {
+      const nextAccount = await fetch(`${API_URL}/api/auth/${mode}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          role: 'merchant',
+          name: String(formData.get('name') || formData.get('email') || 'Local aliado'),
+          merchant_name: String(formData.get('merchant_name') || formData.get('name') || 'Local aliado'),
+          email: String(formData.get('email') || '').trim().toLowerCase(),
+          password: String(formData.get('password') || ''),
+          city: String(formData.get('city') || ''),
+        }),
+      }).then((response) => response.ok ? response.json() : Promise.reject());
+      if (nextAccount.role !== 'merchant') {
+        setAuthMessage('Esta cuenta no corresponde a una empresa.');
+        return;
+      }
+      saveAccount(nextAccount);
+      setAccount(nextAccount);
+      setAuthMessage('Listo. Ya puedes enviar campanas a revision.');
+    } catch {
+      setAuthMessage('No se pudo entrar. Revisa los datos o registra el local.');
+    }
+  }
 
   async function startScan() {
     const Detector = (window as unknown as { BarcodeDetector?: DetectorCtor }).BarcodeDetector;
@@ -179,7 +226,7 @@ export default function MerchantVerifyPage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        merchant_id: 1,
+        merchant_id: account?.merchant_id || 1,
         title: String(formData.get('title') || 'Nueva promo'),
         prize: String(formData.get('prize') || 'Premio especial'),
         rule: String(formData.get('rule')),
@@ -187,10 +234,12 @@ export default function MerchantVerifyPage() {
         city: String(formData.get('city') || ''),
         expires_at: String(formData.get('expires') || 'Durante el mundial'),
         image_url: image,
+        review_status: 'pending_review',
       }),
     }).catch(() => undefined);
     setRewards((current) => [{
       id: Date.now(),
+      merchantId: account?.merchant_id || 1,
       title: String(formData.get('title') || 'Nueva promo'),
       prize: String(formData.get('prize') || 'Premio especial'),
       rule: String(formData.get('rule')) as RewardRule,
@@ -198,6 +247,7 @@ export default function MerchantVerifyPage() {
       expires: String(formData.get('expires') || 'Durante el mundial'),
       image,
       city: String(formData.get('city') || ''),
+      reviewStatus: 'pending_review',
     }, ...current]);
   }
 
@@ -207,7 +257,7 @@ export default function MerchantVerifyPage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        merchant_id: 1,
+        merchant_id: account?.merchant_id || 1,
         title: String(formData.get('title') || 'Promo por visita'),
         description: String(formData.get('description') || 'Beneficio mostrando la app'),
         image_url: image,
@@ -219,10 +269,12 @@ export default function MerchantVerifyPage() {
         tiktok_url: String(formData.get('tiktok') || ''),
         whatsapp_url: String(formData.get('whatsapp') || ''),
         expires_at: String(formData.get('expires') || 'Durante el mundial'),
+        review_status: 'pending_review',
       }),
     }).catch(() => undefined);
     setVisitPromos((current) => [{
       id: Date.now(),
+      merchantId: account?.merchant_id || 1,
       title: String(formData.get('title') || 'Promo por visita'),
       description: String(formData.get('description') || 'Beneficio mostrando la app'),
       image,
@@ -234,6 +286,7 @@ export default function MerchantVerifyPage() {
       tiktok: String(formData.get('tiktok') || ''),
       whatsapp: String(formData.get('whatsapp') || ''),
       expires: String(formData.get('expires') || 'Durante el mundial'),
+      reviewStatus: 'pending_review',
     }, ...current]);
   }
 
@@ -256,6 +309,13 @@ export default function MerchantVerifyPage() {
             </div>
           </div>
         </section>
+
+        {(!account || account.role !== 'merchant') && (
+          <MerchantAuthGate authenticateMerchant={authenticateMerchant} message={authMessage} />
+        )}
+
+        {account?.role === 'merchant' && (
+        <>
 
         <section id="rewards" className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <div className="glass-panel rounded-lg p-5">
@@ -286,7 +346,7 @@ export default function MerchantVerifyPage() {
                 <Field name="quantity" label="Cantidad de vales" placeholder="100" type="number" />
                 <Field name="expires" label="Vigencia" placeholder="30 Jun 23:59" />
               </div>
-              <button className="fantasy-button h-12 rounded-md font-black transition">Guardar premio</button>
+              <button className="fantasy-button h-12 rounded-md font-black transition">Enviar premio a revision</button>
             </form>
           </div>
 
@@ -294,7 +354,7 @@ export default function MerchantVerifyPage() {
             <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-300">Active campaigns</p>
             <h2 className="mt-1 text-3xl font-black">Premios publicados</h2>
             <div className="mt-6 grid gap-3 md:grid-cols-2">
-              {rewards.map((reward) => (
+              {visibleRewards.map((reward) => (
                 <article key={reward.id} className="promo-ticket rounded-lg p-4">
                   <img src={reward.image} alt={reward.title} className="mb-4 h-36 w-full rounded-md object-cover" />
                   <div className="flex items-start justify-between gap-3">
@@ -309,6 +369,7 @@ export default function MerchantVerifyPage() {
                       <p className="text-xs text-slate-400">vales</p>
                     </div>
                   </div>
+                  <StatusBadge status={reward.reviewStatus} />
                   <p className="mt-4 text-xs uppercase tracking-[0.18em] text-slate-400">Vigencia: {reward.expires}</p>
                 </article>
               ))}
@@ -339,7 +400,7 @@ export default function MerchantVerifyPage() {
                 <OptionalField name="whatsapp" label="WhatsApp" placeholder="https://wa.me/..." />
               </div>
               <Field name="expires" label="Vigencia" placeholder="Durante partidos" />
-              <button className="fantasy-button h-12 rounded-md font-black transition">Publicar promo por visita</button>
+              <button className="fantasy-button h-12 rounded-md font-black transition">Enviar promo a revision</button>
             </form>
           </div>
 
@@ -347,7 +408,7 @@ export default function MerchantVerifyPage() {
             <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-300">Public ads</p>
             <h2 className="mt-1 text-3xl font-black">Promos visibles para todos</h2>
             <div className="mt-6 grid gap-3 md:grid-cols-2">
-              {visitPromos.map((promo) => (
+              {visiblePromos.map((promo) => (
                 <article key={promo.id} className="promo-ticket rounded-lg">
                   <img src={promo.image} alt={promo.title} className="h-40 w-full rounded-t-lg object-cover" />
                   <div className="p-4">
@@ -357,6 +418,7 @@ export default function MerchantVerifyPage() {
                     <p className="mt-2 text-sm font-bold text-emerald-200">{promo.city}</p>
                     <p className="mt-1 text-sm text-slate-400">{promo.address}</p>
                     <p className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-400">Vigencia: {promo.expires}</p>
+                    <StatusBadge status={promo.reviewStatus} />
                     <SocialLinks links={[promo.link, promo.instagram, promo.facebook, promo.tiktok, promo.whatsapp]} />
                   </div>
                 </article>
@@ -433,9 +495,39 @@ export default function MerchantVerifyPage() {
           )}
         </section>
         </section>
+        </>
+        )}
       </div>
     </div>
   );
+}
+
+function MerchantAuthGate({ authenticateMerchant, message }: { authenticateMerchant: (formData: FormData) => void | Promise<void>; message: string }) {
+  return (
+    <section className="glass-panel rounded-lg p-5">
+      <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Acceso de empresa</p>
+      <h2 className="mt-1 text-3xl font-black">Entra para crear campanas y verificar vales.</h2>
+      <p className="mt-2 text-sm leading-6 text-slate-300">Cada premio o publicidad queda pendiente hasta que admin revise que la promo sea real.</p>
+      <form action={authenticateMerchant} className="mt-6 grid gap-3 md:grid-cols-2 lg:grid-cols-[0.7fr_1fr_1fr_1fr_1fr_auto]">
+        <select name="mode" className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300">
+          <option value="login">Login</option>
+          <option value="register">Registro</option>
+        </select>
+        <input name="merchant_name" placeholder="Nombre del local" className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" />
+        <input name="city" placeholder="Ciudad" className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" />
+        <input name="email" type="email" placeholder="Email" className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" required />
+        <input name="password" type="password" placeholder="Password" className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" required />
+        <button type="submit" className="h-12 rounded-md bg-white px-5 font-black text-slate-950">Entrar</button>
+      </form>
+      {message && <p className="mt-4 rounded-md bg-white/10 p-3 text-sm text-slate-200">{message}</p>}
+    </section>
+  );
+}
+
+function StatusBadge({ status = 'pending_review' }: { status?: string }) {
+  const label = status === 'approved' ? 'Aprobado' : status === 'rejected' ? 'Rechazado' : status === 'paused' ? 'Pausado' : 'Pendiente de revision';
+  const color = status === 'approved' ? 'bg-emerald-300' : status === 'rejected' ? 'bg-rose-300' : 'bg-amber-300';
+  return <span className={`mt-4 inline-flex rounded-full px-3 py-1 text-xs font-black text-slate-950 ${color}`}>{label}</span>;
 }
 
 function SocialLinks({ links }: { links: string[] }) {

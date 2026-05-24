@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { demoMerchants } from '@/lib/voucherDemo';
+import { readAccount, saveAccount, type Account } from '@/lib/account';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bet2back-production.up.railway.app';
 
 type MerchantPromo = {
+  id?: number;
   name: string;
   city: string;
   zone: string;
@@ -18,6 +20,18 @@ type MerchantPromo = {
   image: string;
   offer: string;
   rule: string;
+  reviewStatus?: string;
+};
+
+type ReviewReward = {
+  id: number;
+  merchant_name: string;
+  title: string;
+  prize: string;
+  rule: string;
+  campaign_city: string;
+  image_url: string;
+  review_status: string;
 };
 
 type Match = {
@@ -54,11 +68,17 @@ export default function AdminPromosPage() {
   const [leads, setLeads] = useState<OutreachLead[]>([]);
   const [leadCityFilter, setLeadCityFilter] = useState('');
   const [resultMessage, setResultMessage] = useState('');
+  const [account, setAccount] = useState<Account | null>(null);
+  const [authMessage, setAuthMessage] = useState('');
+  const [reviewRewards, setReviewRewards] = useState<ReviewReward[]>([]);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/merchant-promotions`)
+    setAccount(readAccount());
+
+    fetch(`${API_URL}/api/merchant-promotions?include_all=1`)
       .then((response) => response.ok ? response.json() : Promise.reject())
       .then((rows) => setPromos(rows.map((row: Record<string, unknown>) => ({
+        id: Number(row.id),
         name: String(row.merchant_name || ''),
         city: String(row.campaign_city || row.city || row.merchant_city || ''),
         zone: String(row.zone || ''),
@@ -71,7 +91,13 @@ export default function AdminPromosPage() {
         image: String(row.image_url || '/world-cup-abstract-bg.png'),
         offer: String(row.description || ''),
         rule: 'Por visitar',
+        reviewStatus: String(row.review_status || 'approved'),
       }))))
+      .catch(() => undefined);
+
+    fetch(`${API_URL}/api/merchant-rewards?include_all=1`)
+      .then((response) => response.ok ? response.json() : Promise.reject())
+      .then(setReviewRewards)
       .catch(() => undefined);
 
     fetch(`${API_URL}/api/matches`)
@@ -84,6 +110,29 @@ export default function AdminPromosPage() {
       .then(setLeads)
       .catch(() => undefined);
   }, []);
+
+  async function loginAdmin(formData: FormData) {
+    setAuthMessage('Validando admin...');
+    try {
+      const nextAccount = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: String(formData.get('email') || '').trim().toLowerCase(),
+          password: String(formData.get('password') || ''),
+        }),
+      }).then((response) => response.ok ? response.json() : Promise.reject());
+      if (nextAccount.role !== 'admin') {
+        setAuthMessage('Esta cuenta no tiene perfil admin.');
+        return;
+      }
+      saveAccount(nextAccount);
+      setAccount(nextAccount);
+      setAuthMessage('Admin conectado.');
+    } catch {
+      setAuthMessage('No se pudo iniciar sesion como admin.');
+    }
+  }
 
   async function uploadImage(formData: FormData) {
     const file = formData.get('image');
@@ -140,6 +189,7 @@ export default function AdminPromosPage() {
           tiktok_url: merchantPayload.tiktok_url,
           whatsapp_url: merchantPayload.whatsapp_url,
           expires_at: String(formData.get('expires') || 'Durante el mundial'),
+          review_status: 'approved',
         }),
       });
     } catch {
@@ -158,7 +208,23 @@ export default function AdminPromosPage() {
       image,
       offer: String(formData.get('offer') || 'Promo especial'),
       rule: String(formData.get('rule') || 'Participar'),
+      reviewStatus: 'approved',
     }, ...current]);
+  }
+
+  async function reviewCampaign(kind: 'promotion' | 'reward', id: number, status: string) {
+    const path = kind === 'promotion' ? `/api/merchant-promotions/${id}/review` : `/api/merchant-rewards/${id}/review`;
+    const response = await fetch(`${API_URL}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ review_status: status }),
+    });
+    if (!response.ok) return;
+    if (kind === 'promotion') {
+      setPromos((current) => current.map((promo) => promo.id === id ? { ...promo, reviewStatus: status } : promo));
+    } else {
+      setReviewRewards((current) => current.map((reward) => reward.id === id ? { ...reward, review_status: status } : reward));
+    }
   }
 
   async function publishResult(formData: FormData) {
@@ -273,6 +339,49 @@ export default function AdminPromosPage() {
               <AdminStat value="Ads" label="cinta" />
               <AdminStat value="Links" label="redes" />
             </div>
+          </div>
+        </section>
+
+        {(!account || account.role !== 'admin') && (
+          <AdminLogin loginAdmin={loginAdmin} message={authMessage} />
+        )}
+
+        {account?.role === 'admin' && (
+        <>
+
+        <section id="reviews" className="glass-panel rounded-lg p-5">
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Campaign review</p>
+          <h2 className="mt-1 text-3xl font-black">Aprobar promociones reales</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-300">
+            Revisa imagen, ciudad, direccion y links del local antes de activar la promo en la app del usuario.
+          </p>
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            {reviewRewards.map((reward) => (
+              <ReviewCard
+                key={`reward-${reward.id}`}
+                title={reward.title}
+                merchant={reward.merchant_name}
+                detail={reward.prize}
+                city={reward.campaign_city}
+                image={reward.image_url}
+                status={reward.review_status}
+                onApprove={() => reviewCampaign('reward', reward.id, 'approved')}
+                onReject={() => reviewCampaign('reward', reward.id, 'rejected')}
+              />
+            ))}
+            {promos.map((promo) => (
+              <ReviewCard
+                key={`promo-${promo.id || promo.name}`}
+                title={promo.name}
+                merchant="Promo por visita"
+                detail={promo.offer}
+                city={promo.city}
+                image={promo.image}
+                status={promo.reviewStatus || 'approved'}
+                onApprove={() => promo.id && reviewCampaign('promotion', promo.id, 'approved')}
+                onReject={() => promo.id && reviewCampaign('promotion', promo.id, 'rejected')}
+              />
+            ))}
           </div>
         </section>
 
@@ -478,8 +587,66 @@ export default function AdminPromosPage() {
           </div>
         </section>
         </div>
+        </>
+        )}
       </div>
     </div>
+  );
+}
+
+function AdminLogin({ loginAdmin, message }: { loginAdmin: (formData: FormData) => void | Promise<void>; message: string }) {
+  return (
+    <section className="glass-panel rounded-lg p-5">
+      <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Admin login</p>
+      <h2 className="mt-1 text-3xl font-black">Panel cerrado para administracion.</h2>
+      <form action={loginAdmin} className="mt-6 grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+        <input name="email" type="email" placeholder="Email admin" className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" required />
+        <input name="password" type="password" placeholder="Password" className="h-12 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" required />
+        <button type="submit" className="h-12 rounded-md bg-white px-5 font-black text-slate-950">Entrar</button>
+      </form>
+      {message && <p className="mt-4 rounded-md bg-white/10 p-3 text-sm text-slate-200">{message}</p>}
+    </section>
+  );
+}
+
+function ReviewCard({
+  title,
+  merchant,
+  detail,
+  city,
+  image,
+  status,
+  onApprove,
+  onReject,
+}: {
+  title: string;
+  merchant: string;
+  detail: string;
+  city: string;
+  image: string;
+  status: string;
+  onApprove: () => void;
+  onReject: () => void;
+}) {
+  return (
+    <article className="promo-ticket rounded-lg">
+      <img src={image || '/world-cup-abstract-bg.png'} alt={title} className="h-36 w-full rounded-t-lg object-cover" />
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-300">{merchant}</p>
+            <h3 className="mt-1 text-xl font-black">{title}</h3>
+          </div>
+          <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-black uppercase text-slate-100">{status}</span>
+        </div>
+        <p className="mt-3 text-sm text-slate-300">{detail}</p>
+        <p className="mt-2 text-sm font-bold text-emerald-200">{city || 'Ciudad global'}</p>
+        <div className="mt-4 flex gap-2">
+          <button type="button" onClick={onApprove} className="rounded-md bg-emerald-300 px-3 py-2 text-xs font-black text-slate-950">Aprobar</button>
+          <button type="button" onClick={onReject} className="rounded-md bg-rose-300 px-3 py-2 text-xs font-black text-slate-950">Rechazar</button>
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -505,7 +672,7 @@ function OptionalField({ name, label, placeholder }: { name: string; label: stri
   return (
     <label className="grid gap-2 text-sm font-semibold text-slate-300">
       {label}
-      <input name={name} type="number" min={0} placeholder={placeholder} className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" />
+      <input name={name} placeholder={placeholder} className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" />
     </label>
   );
 }

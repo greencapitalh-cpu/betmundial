@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import VoucherQr from '@/components/VoucherQr';
 import { useLocale, type Locale } from '@/components/LocaleProvider';
 import { qualifiesForAward } from '@/lib/awardEngine';
+import { readAccount, saveAccount, type Account } from '@/lib/account';
 
 type CouponRule = 'participate' | 'winner' | 'exact' | 'goal_diff' | 'home_goals' | 'away_goals' | 'first_half_goals';
 type Tab = 'matches' | 'bracket' | 'predictions' | 'vouchers' | 'promos';
@@ -511,8 +512,11 @@ export default function HomePage() {
   const [fixtureFilter, setFixtureFilter] = useState('');
   const [promoCityFilter, setPromoCityFilter] = useState('');
   const [deviceId, setDeviceId] = useState('');
+  const [account, setAccount] = useState<Account | null>(null);
+  const [authMessage, setAuthMessage] = useState('');
 
   useEffect(() => {
+    setAccount(readAccount());
     const saved = window.localStorage.getItem('golazo-device-id');
     if (saved) {
       setDeviceId(saved);
@@ -603,16 +607,20 @@ export default function HomePage() {
   }, [activeFan?.id]);
 
   async function savePrediction(formData: FormData) {
+    if (!account || account.role !== 'fan') {
+      setAuthMessage('Registrate o inicia sesion para guardar tu marcador.');
+      return;
+    }
     let userId = Number(formData.get('userId'));
     if (formData.get('userId') === 'new') {
-      const name = String(formData.get('name') || 'Fan');
+      const name = String(formData.get('name') || account.name || 'Fan');
       const id = Date.now();
       const fallbackFan = {
         id,
         name,
         handle: `${name.slice(0, 3).toUpperCase()}-${String(id).slice(-3)}`,
-        contact: String(formData.get('contact') || ''),
-        channel: 'whatsapp',
+        contact: String(formData.get('contact') || account.email || ''),
+        channel: 'whatsapp' as const,
         deviceId,
       } satisfies Fan;
       try {
@@ -662,6 +670,33 @@ export default function HomePage() {
       setPredictions((current) => [nextPrediction, ...current]);
     }
     setTab('predictions');
+  }
+
+  async function authenticateFan(formData: FormData) {
+    const mode = String(formData.get('mode') || 'login');
+    setAuthMessage('Conectando tu cuenta...');
+    try {
+      const payload = {
+        role: 'fan',
+        name: String(formData.get('name') || formData.get('email') || 'Fan'),
+        email: String(formData.get('email') || '').trim().toLowerCase(),
+        password: String(formData.get('password') || ''),
+        city: String(formData.get('city') || ''),
+      };
+      const nextAccount = await apiFetch<Account>(`/api/auth/${mode}`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      if (nextAccount.role !== 'fan') {
+        setAuthMessage('Esta cuenta no es de usuario apostador.');
+        return;
+      }
+      saveAccount(nextAccount);
+      setAccount(nextAccount);
+      setAuthMessage('Listo. Ya puedes guardar tu prediccion.');
+    } catch {
+      setAuthMessage('No se pudo entrar. Revisa email y password, o crea una cuenta nueva.');
+    }
   }
 
   return (
@@ -773,6 +808,9 @@ export default function HomePage() {
               setSelectedFanId={setSelectedFanId}
               deviceId={deviceId}
               savePrediction={savePrediction}
+              account={account}
+              authMessage={authMessage}
+              authenticateFan={authenticateFan}
             />
           </section>
         )}
@@ -940,6 +978,9 @@ function PredictionPanel({
   setSelectedFanId,
   deviceId,
   savePrediction,
+  account,
+  authMessage,
+  authenticateFan,
 }: {
   id?: string;
   t: Record<string, string>;
@@ -948,42 +989,100 @@ function PredictionPanel({
   selectedFanId: number | 'new';
   setSelectedFanId: (id: number | 'new') => void;
   deviceId: string;
-  savePrediction: (formData: FormData) => void;
+  savePrediction: (formData: FormData) => void | Promise<void>;
+  account: Account | null;
+  authMessage: string;
+  authenticateFan: (formData: FormData) => void | Promise<void>;
 }) {
+  const [homeScore, setHomeScore] = useState(0);
+  const [awayScore, setAwayScore] = useState(0);
+
+  useEffect(() => {
+    setHomeScore(0);
+    setAwayScore(0);
+  }, [match.id]);
+
   return (
     <section id={id} className="glass-panel rounded-lg p-5">
       <SectionTitle title={t.play} helper={`${match.homeFlag} ${match.home} vs ${match.awayFlag} ${match.away}`} />
+      {(!account || account.role !== 'fan') && (
+        <FanAuthGate authenticateFan={authenticateFan} message={authMessage} />
+      )}
       <form action={savePrediction} className="mt-5 grid gap-4">
         <input type="hidden" name="matchId" value={match.id} />
-        <label className="grid gap-2 text-sm font-semibold text-slate-300">
-          {t.selectFan}
-          <select
-            name="userId"
-            value={selectedFanId}
-            onChange={(event) => setSelectedFanId(event.target.value === 'new' ? 'new' : Number(event.target.value))}
-            className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300"
-          >
-            {fans.map((fan) => <option key={fan.id} value={fan.id}>{fan.name} - {fan.handle}</option>)}
-            <option value="new">{t.newFan}</option>
-          </select>
-        </label>
-        {selectedFanId === 'new' && (
+        <input type="hidden" name="userId" value={selectedFanId} />
+        <input type="hidden" name="homeScore" value={homeScore} />
+        <input type="hidden" name="awayScore" value={awayScore} />
+        {account && account.role === 'fan' && (
           <div className="fan-card grid gap-3 rounded-lg border border-amber-300/20 p-4">
             <div className="rounded-md border border-white/10 bg-slate-950/80 p-3">
-              <span className="text-xs uppercase tracking-[0.18em] text-amber-300">{t.device}</span>
-              <strong className="mt-1 block text-lg">{deviceId || 'Generating...'}</strong>
+              <span className="text-xs uppercase tracking-[0.18em] text-amber-300">Cuenta activa</span>
+              <strong className="mt-1 block text-lg">{account.name}</strong>
+              <span className="mt-1 block text-xs text-slate-400">{account.email} - {t.device}: {deviceId || 'Generating...'}</span>
             </div>
-            <Field name="name" label={t.name} placeholder="Ana Torres" />
-            <Field name="contact" label={t.contact} placeholder="+52... / fan@email.com" />
+            <input type="hidden" name="name" value={account.name} />
+            <input type="hidden" name="contact" value={account.email} />
+            {fans.length > 1 && (
+              <label className="grid gap-2 text-sm font-semibold text-slate-300">
+                {t.selectFan}
+                <select
+                  value={selectedFanId}
+                  onChange={(event) => setSelectedFanId(event.target.value === 'new' ? 'new' : Number(event.target.value))}
+                  className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300"
+                >
+                  {fans.map((fan) => <option key={fan.id} value={fan.id}>{fan.name} - {fan.handle}</option>)}
+                  <option value="new">{t.newFan}</option>
+                </select>
+              </label>
+            )}
           </div>
         )}
-        <div className="grid grid-cols-2 gap-3">
-          <Field name="homeScore" label={match.home} placeholder="0" type="number" />
-          <Field name="awayScore" label={match.away} placeholder="0" type="number" />
+        <div className="grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+          <ScoreStepper label={match.home} code={match.homeFlag} value={homeScore} setValue={setHomeScore} />
+          <div className="hidden text-center text-3xl font-black text-amber-300 sm:block">:</div>
+          <ScoreStepper label={match.away} code={match.awayFlag} value={awayScore} setValue={setAwayScore} />
         </div>
-        <button className="fantasy-button h-12 rounded-md font-black transition">{t.save}</button>
+        <button disabled={!account || account.role !== 'fan'} className="fantasy-button h-12 rounded-md font-black transition disabled:cursor-not-allowed disabled:opacity-45">{t.save}</button>
       </form>
     </section>
+  );
+}
+
+function FanAuthGate({ authenticateFan, message }: { authenticateFan: (formData: FormData) => void | Promise<void>; message: string }) {
+  return (
+    <div className="mt-5 rounded-lg border border-amber-300/25 bg-slate-950/75 p-4">
+      <p className="text-sm font-black uppercase tracking-[0.18em] text-amber-300">Registro para guardar</p>
+      <p className="mt-2 text-sm text-slate-300">Puedes mirar fixture y promos libremente. Para guardar tu marcador necesitamos identificarte.</p>
+      <form action={authenticateFan} className="mt-4 grid gap-3 md:grid-cols-[0.75fr_1fr_1fr_1fr_auto]">
+        <select name="mode" className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300">
+          <option value="login">Login</option>
+          <option value="register">Registro</option>
+        </select>
+        <input name="name" placeholder="Nombre" className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" />
+        <input name="email" type="email" placeholder="Email" className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" required />
+        <input name="password" type="password" placeholder="Password" className="h-11 rounded-md border border-white/10 bg-slate-950 px-3 text-white outline-none focus:border-amber-300" required />
+        <button className="h-11 rounded-md bg-white px-4 font-black text-slate-950" type="submit">Entrar</button>
+      </form>
+      {message && <p className="mt-3 rounded-md bg-white/10 p-3 text-sm text-slate-200">{message}</p>}
+    </div>
+  );
+}
+
+function ScoreStepper({ label, code, value, setValue }: { label: string; code: string; value: number; setValue: (value: number) => void }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <span className="rounded bg-white px-2 py-1 text-xs font-black text-slate-950">{code}</span>
+          <strong className="mt-2 block truncate text-lg">{label}</strong>
+        </div>
+        <strong className="text-5xl font-black tabular-nums text-amber-300">{value}</strong>
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <button type="button" onClick={() => setValue(Math.max(0, value - 1))} className="h-11 rounded-md bg-white/10 text-2xl font-black text-white transition hover:bg-white/20">-</button>
+        <button type="button" onClick={() => setValue(Math.min(15, value + 1))} className="h-11 rounded-md bg-white text-2xl font-black text-slate-950 transition hover:bg-amber-300">+</button>
+      </div>
+    </div>
   );
 }
 
