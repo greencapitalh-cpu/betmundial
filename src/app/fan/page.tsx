@@ -530,12 +530,29 @@ export default function HomePage() {
   const [oauthStatus, setOauthStatus] = useState<OAuthStatus>({ google: false, facebook: false });
 
   useEffect(() => {
-    setAccount(readAccount());
-    const authError = new URLSearchParams(window.location.search).get('auth_error');
+    const params = new URLSearchParams(window.location.search);
+    const oauthAccount = params.get('oauth_account');
+    if (oauthAccount) {
+      try {
+        const nextAccount = JSON.parse(oauthAccount) as Account;
+        if (nextAccount.role === 'fan' && nextAccount.email) {
+          saveAccount(nextAccount);
+          setAccount(nextAccount);
+          setAuthMessage(`Welcome, ${nextAccount.email}. Ya puedes guardar tus predicciones.`);
+        }
+      } catch {
+        setAuthMessage('Google completo el acceso, pero no pudimos abrir la sesion en la app.');
+      }
+      window.history.replaceState(null, '', window.location.pathname);
+    } else {
+      setAccount(readAccount());
+    }
+    const authError = params.get('auth_error');
     if (authError) {
       setAuthMessage(authError.includes('not_configured')
         ? 'Google/Facebook OAuth todavia no tiene credenciales configuradas en Railway.'
         : 'No se pudo completar el acceso social. Proba con email/password.');
+      window.history.replaceState(null, '', window.location.pathname);
     }
     const saved = window.localStorage.getItem('golazo-device-id');
     if (saved) {
