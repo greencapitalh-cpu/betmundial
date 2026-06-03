@@ -1245,34 +1245,39 @@ function KnockoutBracket({
   const final = matches.find((match) => match.id === 104);
 
   return (
-    <section className="glass-panel rounded-lg p-5">
-      <SectionTitle title={t.bracket} helper={t.bracketHelper} />
-      <div className="bracket-board mt-6 overflow-x-auto rounded-lg border border-white/10 p-4 pb-5">
-        <div className="grid min-w-[1180px] grid-cols-[1.1fr_1fr_0.95fr_0.9fr_1.1fr_0.9fr_0.95fr_1fr_1.1fr] gap-4">
-          <BracketColumn title="Round of 32" matches={round32.slice(0, 8)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} />
-          <BracketColumn title="Round of 16" matches={r16.slice(0, 4)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced />
-          <BracketColumn title="Quarter-finals" matches={qf.slice(0, 2)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced />
-          <BracketColumn title="Semi-finals" matches={sf.slice(0, 1)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} center />
-          <div className="grid content-center gap-4">
-            <p className="text-center text-xs font-black uppercase tracking-[0.2em] text-amber-300">Final</p>
-            {final && <BracketMatch match={final} selected={selectedMatchId === final.id} setSelectedMatchId={setSelectedMatchId} locale={locale} featured />}
-            {bronze && (
-              <div>
-                <p className="mb-2 text-center text-xs font-black uppercase tracking-[0.2em] text-slate-400">{t.thirdPlace}</p>
-                <BracketMatch match={bronze} selected={selectedMatchId === bronze.id} setSelectedMatchId={setSelectedMatchId} locale={locale} />
-              </div>
-            )}
-          </div>
-          <BracketColumn title="Semi-finals" matches={sf.slice(1, 2)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} center reverse />
-          <BracketColumn title="Quarter-finals" matches={qf.slice(2, 4)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced reverse />
-          <BracketColumn title="Round of 16" matches={r16.slice(4, 8)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced reverse />
-          <BracketColumn title="Round of 32" matches={round32.slice(8, 16)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} reverse />
-        </div>
+
+
+
+<section className="relative overflow-hidden border-b border-cyan-200/20 bg-gradient-to-br from-[#061826] via-[#08364a] to-[#0b8fa3]">
+  <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-12 lg:grid-cols-[1fr_320px] lg:items-center lg:py-16">
+    <div>
+      <p className="text-sm font-black uppercase tracking-[0.28em] text-cyan-200">{t.kicker}</p>
+      <h1 className="mt-4 max-w-3xl text-4xl font-black leading-tight text-white md:text-6xl">{t.title}</h1>
+      <p className="mt-5 max-w-2xl text-lg leading-8 text-cyan-50/85">{t.body}</p>
+
+      <div className="mt-7 flex flex-wrap gap-3">
+        <Pill label={`${matches.length} ${t.matches}`} />
+        <Pill label={`${myPredictions.length} ${t.predictions}`} />
+        <Pill label={`${vouchers.length || localVouchers.length} ${t.vouchers}`} />
       </div>
-    </section>
+    </div>
+
+    <div className="flex justify-center lg:justify-end">
+      <div className="rounded-2xl border border-white/20 bg-white/10 p-4 shadow-2xl backdrop-blur">
+        <img
+          src="/uperlogo.png"
+          alt="Upper Deck Seafood & Sports"
+          className="w-56 md:w-72"
+        />
+        <p className="mt-3 text-center text-xs font-black uppercase tracking-[0.2em] text-cyan-100">
+          Official Partner
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
   );
 }
-
 function BracketColumn({
   title,
   matches,
