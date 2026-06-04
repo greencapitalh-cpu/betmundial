@@ -1245,37 +1245,29 @@ function KnockoutBracket({
   const final = matches.find((match) => match.id === 104);
 
   return (
-
-
-
-<section className="relative overflow-hidden border-b border-cyan-200/20 bg-gradient-to-br from-[#061826] via-[#08364a] to-[#0b8fa3]">
-  <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-12 lg:grid-cols-[1fr_320px] lg:items-center lg:py-16">
-    <div>
-      <p className="text-sm font-black uppercase tracking-[0.28em] text-cyan-200">{t.kicker}</p>
-      <h1 className="mt-4 max-w-3xl text-4xl font-black leading-tight text-white md:text-6xl">{t.title}</h1>
-      <p className="mt-5 max-w-2xl text-lg leading-8 text-cyan-50/85">{t.body}</p>
-
-      <div className="mt-7 flex flex-wrap gap-3">
-        <Pill label={`${matches.length} ${t.matches}`} />
-        <Pill label={`${myPredictions.length} ${t.predictions}`} />
-        <Pill label={`${vouchers.length || localVouchers.length} ${t.vouchers}`} />
+    <section className="glass-panel rounded-lg p-4">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-amber-300">{t.bracket}</p>
+          <h2 className="text-2xl font-black">Knockout path</h2>
+        </div>
+        <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-black text-slate-300">{matches.length} matches</span>
       </div>
-    </div>
-
-    <div className="flex justify-center lg:justify-end">
-      <div className="rounded-2xl border border-white/20 bg-white/10 p-4 shadow-2xl backdrop-blur">
-        <img
-          src="/uperlogo.png"
-          alt="Upper Deck Seafood & Sports"
-          className="w-56 md:w-72"
-        />
-        <p className="mt-3 text-center text-xs font-black uppercase tracking-[0.2em] text-cyan-100">
-          Official Partner
-        </p>
+      <div className="bracket-board grid min-w-[980px] gap-4 overflow-x-auto rounded-lg border border-white/10 p-4 lg:grid-cols-[1.2fr_1fr_0.85fr_0.85fr_1fr_1.2fr]">
+        <BracketColumn title="Round of 32" matches={round32.slice(0, 8)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} />
+        <BracketColumn title="Round of 16" matches={r16.slice(0, 4)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced />
+        <BracketColumn title="Quarterfinals" matches={qf.slice(0, 2)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} center />
+        <div className="grid content-center gap-3">
+          <p className="text-center text-xs font-black uppercase tracking-[0.2em] text-amber-300">Finals</p>
+          {sf[0] && <BracketMatch match={sf[0]} selected={selectedMatchId === sf[0].id} setSelectedMatchId={setSelectedMatchId} locale={locale} featured />}
+          {final && <BracketMatch match={final} selected={selectedMatchId === final.id} setSelectedMatchId={setSelectedMatchId} locale={locale} featured />}
+          {bronze && <BracketMatch match={bronze} selected={selectedMatchId === bronze.id} setSelectedMatchId={setSelectedMatchId} locale={locale} />}
+          {sf[1] && <BracketMatch match={sf[1]} selected={selectedMatchId === sf[1].id} setSelectedMatchId={setSelectedMatchId} locale={locale} featured />}
+        </div>
+        <BracketColumn title="Quarterfinals" matches={qf.slice(2, 4)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} center reverse />
+        <BracketColumn title="Round of 16" matches={r16.slice(4, 8)} selectedMatchId={selectedMatchId} setSelectedMatchId={setSelectedMatchId} locale={locale} spaced reverse />
       </div>
-    </div>
-  </div>
-</section>
+    </section>
   );
 }
 function BracketColumn({
