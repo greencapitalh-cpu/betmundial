@@ -102,17 +102,17 @@ const fansSeed: Fan[] = [];
 const predictionsSeed: Prediction[] = [];
 
 const couponsSeed: Coupon[] = [
-  { id: 1, merchant: 'Upper Deck Ale & Sports Grille', city: 'Hallandale Beach', zone: 'E Hallandale Beach Blvd', address: '906 E Hallandale Beach Blvd, Hallandale Beach, FL 33009', offer: 'Free appetizer for exact World Cup score winners', rule: 'exact', quantity: 80, link: 'https://upperdeckhallandalebeach.com', instagram: '', facebook: '', tiktok: '', whatsapp: '', image: '/upper-deck-photo.jpg', level: 'Oro', expires: '12 Jun 23:59' },
-  { id: 2, merchant: 'Upper Deck Watch Party', city: 'Hallandale Beach', zone: 'Outdoor deck', address: '906 E Hallandale Beach Blvd, Hallandale Beach, FL 33009', offer: '$2 off appetizers when you predict the winner', rule: 'winner', quantity: 120, link: 'https://upperdeckhallandalebeach.com', instagram: '', facebook: '', tiktok: '', whatsapp: '', image: '/upper-deck-photo.jpg', level: 'Plata', expires: '13 Jun 23:59' },
-  { id: 3, merchant: 'Upper Deck Seafood Night', city: 'Hallandale Beach', zone: 'Seafood & Sports', address: '906 E Hallandale Beach Blvd, Hallandale Beach, FL 33009', offer: 'Check-in voucher for World Cup match nights', rule: 'participate', quantity: 200, link: 'https://upperdeckhallandalebeach.com', instagram: '', facebook: '', tiktok: '', whatsapp: '', image: '/upper-deck-photo.jpg', level: 'Barrio', expires: '30 Jun 23:59' },
-  { id: 4, merchant: 'Upper Deck Bar Rewards', city: 'Hallandale Beach', zone: 'Main bar', address: '906 E Hallandale Beach Blvd, Hallandale Beach, FL 33009', offer: 'Seafood match-night bonus for exact score picks', rule: 'exact', quantity: 60, link: 'https://upperdeckhallandalebeach.com', instagram: '', facebook: '', tiktok: '', whatsapp: '', image: '/upper-deck-photo.jpg', level: 'Oro', expires: '18 Jun 23:59' },
+  { id: 1, merchant: 'Boliche La Final', city: 'La Paz', zone: 'Centro', address: 'Zona comercial', offer: '2x1 en entrada antes de medianoche', rule: 'exact', quantity: 80, link: 'https://maps.google.com', instagram: '', facebook: '', tiktok: '', whatsapp: '', image: '/world-cup-abstract-bg.png', level: 'Oro', expires: '12 Jun 23:59' },
+  { id: 2, merchant: 'Terraza Gol Norte', city: 'Guadalajara', zone: 'Zapopan', address: 'Zona bar', offer: 'Bucket 3x2 para mesa mundialista', rule: 'winner', quantity: 120, link: 'https://maps.google.com', instagram: '', facebook: '', tiktok: '', whatsapp: '', image: '/world-cup-abstract-bg.png', level: 'Plata', expires: '13 Jun 23:59' },
+  { id: 3, merchant: 'Fan Zone Burger', city: 'Monterrey', zone: 'San Pedro', address: 'Zona restaurante', offer: 'Papas gratis con cualquier combo', rule: 'participate', quantity: 200, link: 'https://maps.google.com', instagram: '', facebook: '', tiktok: '', whatsapp: '', image: '/world-cup-abstract-bg.png', level: 'Barrio', expires: '30 Jun 23:59' },
+  { id: 4, merchant: 'After Match Club', city: 'Santa Cruz', zone: 'Equipetrol', address: 'Zona nightlife', offer: '15% off en lista VIP', rule: 'exact', quantity: 60, link: 'https://maps.google.com', instagram: '', facebook: '', tiktok: '', whatsapp: '', image: '/world-cup-abstract-bg.png', level: 'Oro', expires: '18 Jun 23:59' },
 ];
 
 const text: Record<Locale, Record<string, string>> = {
   en: {
-    kicker: 'Upper Deck World Cup picks',
-    title: 'Predict the score. Watch at Upper Deck. Redeem your QR.',
-    body: 'Choose a World Cup match, save your score before kickoff, and unlock Upper Deck seafood and sports-bar rewards when your prediction hits.',
+    kicker: 'World fantasy bet',
+    title: 'Predict, win vouchers, show your QR.',
+    body: 'Join with almost no friction: choose a match, save your score, and claim local rewards if you hit.',
     matches: 'Matches',
     bracket: 'Bracket',
     predictions: 'My predictions',
@@ -149,9 +149,9 @@ const text: Record<Locale, Record<string, string>> = {
     city: 'City',
   },
   es: {
-    kicker: 'Upper Deck Prode Mundial',
-    title: 'Pronostica el marcador. Mira el partido en Upper Deck. Canjea tu QR.',
-    body: 'Elige un partido del Mundial, guarda tu marcador antes del inicio y desbloquea premios seafood & sports-bar de Upper Deck si aciertas.',
+    kicker: 'Fantasy bet mundialista',
+    title: 'Pronostica, gana vales y muestra tu QR.',
+    body: 'Participa sin friccion: elige partido, guarda marcador y reclama premios locales si aciertas.',
     matches: 'Partidos',
     bracket: 'Llaves',
     predictions: 'Mis predicciones',
@@ -755,27 +755,16 @@ export default function HomePage() {
   return (
     <div className="stadium-surface min-h-screen text-white">
       <section className="world-hero-bg relative overflow-hidden border-b border-white/10">
-        <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-12 lg:grid-cols-[1fr_320px] lg:items-center lg:py-16">
+        <div className="trophy-silhouette hidden md:block" aria-hidden="true" />
+        <div className="relative mx-auto max-w-7xl px-4 py-12 lg:py-16">
           <div>
-            <p className="text-sm font-black uppercase tracking-[0.28em] text-[#69d6ca]">{t.kicker}</p>
+            <p className="text-sm font-black uppercase tracking-[0.28em] text-amber-300">{t.kicker}</p>
             <h1 className="mt-4 max-w-3xl text-4xl font-black leading-tight md:text-6xl">{t.title}</h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-cyan-50/85">{t.body}</p>
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">{t.body}</p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Pill label={`${matches.length} ${t.matches}`} />
               <Pill label={`${myPredictions.length} ${t.predictions}`} />
               <Pill label={`${vouchers.length || localVouchers.length} ${t.vouchers}`} />
-            </div>
-          </div>
-          <div className="flex justify-center lg:justify-end">
-            <div className="rounded-2xl border border-[#f2d79d]/30 bg-[#071d2b]/80 p-4 shadow-2xl backdrop-blur">
-              <img
-                src="/upper-deck-goalpromo-logo.svg"
-                alt="Upper Deck Seafood and Sports"
-                className="w-56 md:w-72"
-              />
-              <p className="mt-3 text-center text-xs font-black uppercase tracking-[0.2em] text-[#f2d79d]">
-                World Cup Rewards Partner
-              </p>
             </div>
           </div>
         </div>
@@ -794,7 +783,7 @@ export default function HomePage() {
             <button
               key={item}
               onClick={() => setTab(item)}
-              className={`h-12 rounded-md text-sm font-black transition ${tab === item ? 'bg-[#f2d79d] text-[#04121c] shadow-[0_10px_28px_rgba(105,214,202,0.18)]' : 'text-slate-200 hover:bg-white/10'}`}
+              className={`h-12 rounded-md text-sm font-black transition ${tab === item ? 'bg-amber-300 text-slate-950 shadow-[0_10px_28px_rgba(247,201,72,0.18)]' : 'text-slate-200 hover:bg-white/10'}`}
               type="button"
             >
               {t[item]}
