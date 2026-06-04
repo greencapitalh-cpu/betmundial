@@ -102,21 +102,33 @@ export default function Header() {
   const navLinks = navCopy[locale][role];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#050914]/90 backdrop-blur-xl">
+    <header className={`sticky top-0 z-50 border-b backdrop-blur-xl ${role === 'fan' ? 'border-[#20284f]/15 bg-white/95' : 'border-white/10 bg-[#050914]/90'}`}>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         <Link href={brand.home} className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 via-rose-400 to-emerald-300 text-sm font-black text-slate-950">
-            GP
-          </div>
-          <span className="text-xl font-bold text-white">
-            {brand.title.includes('Promo') ? 'Golazo' : brand.title.split(' ')[0]}
-            <span className="text-amber-300">{brand.title.includes('Promo') ? 'Promo' : ` ${brand.title.split(' ').slice(1).join(' ')}`}</span>
-          </span>
+          {role === 'fan' ? (
+            <>
+              <img src="/upper-deck-logo-photo.jpg" alt="Upper Deck Seafood & Sports" className="h-11 w-11 rounded-sm object-cover object-center" />
+              <span className="leading-tight">
+                <span className="block font-serif text-xl font-black tracking-[0.12em] text-[#20284f]">UPPER DECK</span>
+                <span className="block text-[10px] font-black uppercase tracking-[0.18em] text-[#20284f]/70">Seafood & Sports</span>
+              </span>
+            </>
+          ) : (
+            <>
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 via-rose-400 to-emerald-300 text-sm font-black text-slate-950">
+                GP
+              </div>
+              <span className="text-xl font-bold text-white">
+                {brand.title.includes('Promo') ? 'Golazo' : brand.title.split(' ')[0]}
+                <span className="text-amber-300">{brand.title.includes('Promo') ? 'Promo' : ` ${brand.title.split(' ').slice(1).join(' ')}`}</span>
+              </span>
+            </>
+          )}
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
           {navLinks.map((link) => (
-            <Link key={link.href} href={link.href} className="rounded-md px-3 py-2 text-sm text-slate-300 transition-colors hover:bg-white/10 hover:text-amber-300">
+            <Link key={link.href} href={link.href} className={`rounded-md px-3 py-2 text-sm transition-colors ${role === 'fan' ? 'font-semibold text-[#20284f] hover:bg-[#55b8d4]/10 hover:text-[#55b8d4]' : 'text-slate-300 hover:bg-white/10 hover:text-amber-300'}`}>
               {link.label}
             </Link>
           ))}
@@ -125,7 +137,7 @@ export default function Header() {
         <select
           value={locale}
           onChange={(event) => setLocale(event.target.value as Locale)}
-          className="hidden h-10 rounded-md border border-white/10 bg-white/10 px-3 text-sm font-bold text-white outline-none lg:block"
+          className={`hidden h-10 rounded-md border px-3 text-sm font-bold outline-none lg:block ${role === 'fan' ? 'border-[#20284f]/15 bg-white text-[#20284f]' : 'border-white/10 bg-white/10 text-white'}`}
           aria-label="Language"
         >
           {Object.entries(localeNames).map(([key, label]) => (
@@ -133,7 +145,7 @@ export default function Header() {
           ))}
         </select>
 
-        <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 text-slate-300 hover:text-white lg:hidden" aria-label="Toggle menu">
+        <button onClick={() => setMenuOpen(!menuOpen)} className={`p-2 lg:hidden ${role === 'fan' ? 'text-[#20284f] hover:text-[#55b8d4]' : 'text-slate-300 hover:text-white'}`} aria-label="Toggle menu">
           <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {menuOpen ? (
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -145,9 +157,9 @@ export default function Header() {
       </div>
 
       {menuOpen && (
-        <nav className="border-t border-white/10 bg-[#050914] px-4 py-2 lg:hidden">
+        <nav className={`border-t px-4 py-2 lg:hidden ${role === 'fan' ? 'border-[#20284f]/10 bg-white' : 'border-white/10 bg-[#050914]'}`}>
           {navLinks.map((link) => (
-            <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)} className="block px-3 py-2 text-sm text-slate-300 transition-colors hover:text-amber-300">
+            <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)} className={`block px-3 py-2 text-sm transition-colors ${role === 'fan' ? 'font-semibold text-[#20284f] hover:text-[#55b8d4]' : 'text-slate-300 hover:text-amber-300'}`}>
               {link.label}
             </Link>
           ))}
