@@ -107,8 +107,12 @@ export default function Header() {
         <Link href={brand.home} className="flex items-center gap-2">
           {role === 'fan' ? (
             <>
-              <div className="upperdeck-app-mark flex h-10 w-10 items-center justify-center rounded-md border border-white/40 text-sm font-black tracking-[0.12em] text-[#20284f] shadow-lg">
-                UD
+              <div className="flex h-12 w-20 items-center justify-center overflow-hidden rounded-md border border-white/30 bg-[#155993] shadow-lg sm:w-24">
+                <img
+                  src="/upper-deck-header-logo.jpg"
+                  alt="Upper Deck Seafood & Sports"
+                  className="h-24 w-24 max-w-none object-cover object-center sm:h-28 sm:w-28"
+                />
               </div>
               <span className="leading-tight">
                 <span className="block text-xl font-black tracking-[0.04em] text-white">Upper Deck <span className="text-amber-300">Fan App</span></span>
