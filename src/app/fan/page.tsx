@@ -756,7 +756,7 @@ export default function HomePage() {
     <div className="stadium-surface min-h-screen text-white">
       <section className="world-hero-bg relative overflow-hidden border-b border-white/10">
         <div className="trophy-silhouette hidden md:block" aria-hidden="true" />
-        <div className="relative mx-auto max-w-7xl px-4 py-12 lg:py-16">
+        <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-12 lg:grid-cols-[1fr_300px] lg:items-center lg:py-16">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.28em] text-amber-300">{t.kicker}</p>
             <h1 className="mt-4 max-w-3xl text-4xl font-black leading-tight md:text-6xl">{t.title}</h1>
@@ -767,6 +767,27 @@ export default function HomePage() {
               <Pill label={`${vouchers.length || localVouchers.length} ${t.vouchers}`} />
             </div>
           </div>
+          <aside className="overflow-hidden rounded-lg border border-white/20 bg-white text-[#20284f] shadow-2xl">
+            <div className="border-b border-[#20284f]/10 bg-white px-4 py-3">
+              <img
+                src="/upper-deck-logo-photo.jpg"
+                alt="Upper Deck Seafood & Sports"
+                className="mx-auto h-24 w-full rounded-md object-cover object-center"
+              />
+            </div>
+            <div className="px-4 py-4 text-center">
+              <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#55b8d4]">Official watch party partner</p>
+              <h2 className="mt-2 font-serif text-2xl leading-tight text-[#20284f]">Upper Deck</h2>
+              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#20284f]/70">Seafood & Sports</p>
+              <p className="mt-3 text-sm leading-6 text-[#20284f]/80">906 East Hallandale Beach Boulevard</p>
+              <div className="mt-4 grid grid-cols-2 gap-2 text-[11px] font-black uppercase tracking-[0.16em]">
+                <span className="rounded border border-[#55b8d4]/35 px-2 py-2">Order</span>
+                <span className="rounded border border-[#55b8d4]/35 px-2 py-2">Reserve</span>
+                <span className="rounded border border-[#55b8d4]/35 px-2 py-2">Parties</span>
+                <span className="rounded border border-[#55b8d4]/35 px-2 py-2">Catering</span>
+              </div>
+            </div>
+          </aside>
         </div>
       </section>
 
