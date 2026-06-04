@@ -16,7 +16,7 @@
 }
 
 body {
-  background: #050914;
+  background: #061620;
   color: var(--color-foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
@@ -28,24 +28,24 @@ body {
 
 .world-hero-bg {
   background-image:
-    linear-gradient(90deg, rgba(5, 9, 20, 0.98) 0%, rgba(5, 9, 20, 0.8) 42%, rgba(5, 9, 20, 0.22) 100%),
-    linear-gradient(180deg, rgba(5, 9, 20, 0.05), rgba(5, 9, 20, 0.95)),
-    url('/world-cup-abstract-bg.png');
+    linear-gradient(90deg, rgba(4, 18, 28, 0.98) 0%, rgba(6, 35, 52, 0.86) 46%, rgba(6, 35, 52, 0.34) 100%),
+    linear-gradient(180deg, rgba(4, 18, 28, 0.04), rgba(4, 18, 28, 0.98)),
+    url('/upper-deck-photo.jpg');
   background-position: center;
   background-size: cover;
 }
 
 .stadium-surface {
   background:
-    radial-gradient(circle at 18% 10%, rgba(255, 196, 77, 0.17), transparent 30%),
-    radial-gradient(circle at 86% 22%, rgba(0, 229, 160, 0.14), transparent 30%),
-    linear-gradient(135deg, #050914 0%, #081832 42%, #2a0d30 100%);
+    radial-gradient(circle at 16% 8%, rgba(242, 215, 157, 0.16), transparent 28%),
+    radial-gradient(circle at 86% 18%, rgba(105, 214, 202, 0.16), transparent 30%),
+    linear-gradient(135deg, #04121c 0%, #092b40 48%, #071d2b 100%);
 }
 
 .glass-panel {
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(242, 215, 157, 0.18);
   background:
-    linear-gradient(145deg, rgba(9, 20, 44, 0.92), rgba(16, 24, 46, 0.74)),
+    linear-gradient(145deg, rgba(7, 29, 43, 0.94), rgba(8, 37, 54, 0.78)),
     linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 42%);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
   backdrop-filter: blur(18px);
@@ -95,8 +95,8 @@ body {
 
 .fan-card {
   background:
-    linear-gradient(135deg, rgba(0, 229, 160, 0.12), rgba(247, 201, 72, 0.08)),
-    #07142a;
+    linear-gradient(135deg, rgba(105, 214, 202, 0.13), rgba(242, 215, 157, 0.1)),
+    #071d2b;
 }
 
 .promo-ticket {
@@ -105,9 +105,9 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.18);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03)),
-    radial-gradient(circle at 0% 50%, rgba(255, 196, 77, 0.34), transparent 20%),
-    radial-gradient(circle at 100% 0%, rgba(255, 61, 113, 0.32), transparent 26%),
-    #0b1430;
+    radial-gradient(circle at 0% 50%, rgba(242, 215, 157, 0.34), transparent 20%),
+    radial-gradient(circle at 100% 0%, rgba(105, 214, 202, 0.26), transparent 26%),
+    #071d2b;
 }
 
 .role-card {
@@ -134,7 +134,7 @@ body {
   width: 24px;
   height: 24px;
   border-radius: 999px;
-  background: #07111f;
+  background: #04121c;
   transform: translateY(-50%);
 }
 
@@ -143,14 +143,14 @@ body {
 
 .fixture-card {
   background:
-    linear-gradient(135deg, rgba(0, 229, 160, 0.1), rgba(255, 255, 255, 0.03)),
-    #09162f;
+    linear-gradient(135deg, rgba(105, 214, 202, 0.11), rgba(255, 255, 255, 0.03)),
+    #082536;
 }
 
 .fixture-card:hover {
   background:
-    linear-gradient(135deg, rgba(0, 229, 160, 0.16), rgba(247, 201, 72, 0.06)),
-    #0a1936;
+    linear-gradient(135deg, rgba(105, 214, 202, 0.18), rgba(242, 215, 157, 0.08)),
+    #0b2f45;
 }
 
 .bracket-board {
@@ -168,7 +168,7 @@ body {
   right: -13px;
   width: 13px;
   height: 1px;
-  background: rgba(247, 201, 72, 0.32);
+  background: rgba(242, 215, 157, 0.32);
 }
 
 .bracket-match-left::after {
@@ -183,9 +183,9 @@ body {
 }
 
 .fantasy-button {
-  background: linear-gradient(135deg, #f7c948, #ff5f6d 55%, #00e5a0);
-  color: #050914;
-  box-shadow: 0 14px 30px rgba(255, 95, 109, 0.2);
+  background: linear-gradient(135deg, #f2d79d, #69d6ca 58%, #ffffff);
+  color: #04121c;
+  box-shadow: 0 14px 30px rgba(105, 214, 202, 0.18);
 }
 
 .fantasy-button:hover {
