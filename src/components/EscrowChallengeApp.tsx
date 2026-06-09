@@ -281,7 +281,7 @@ export default function EscrowChallengeApp() {
     if (navigator.share) {
       await navigator.share({
         title: `${agreement.match.homeTeam} vs ${agreement.match.awayTeam}`,
-        text: `Accept my UDoChain Escrow Challenge for ${agreement.stakePerPlayer} EscrowCoins.`,
+        text: `Accept my EscrowBet.cool challenge for ${agreement.stakePerPlayer} EscrowCoins.`,
         url,
       }).catch(() => undefined);
       return;
@@ -299,7 +299,7 @@ export default function EscrowChallengeApp() {
               <div className="user-orb"><UserRound size={19} /></div>
               <div className="min-w-0">
                 <p className="truncate text-sm font-black text-white">
-                  {account ? `${t.welcome}, ${account.email}` : 'World Cup Escrow Challenge'}
+                  {account ? `${t.welcome}, ${account.email}` : 'EscrowBet.cool World Cup'}
                 </p>
                 <p className="text-[11px] text-slate-400">
                   {account ? 'Verified UDoChain session' : 'Create challenges with virtual credits'}
@@ -504,7 +504,7 @@ export default function EscrowChallengeApp() {
       {qrOpen && (
         <Modal title="Open on your phone" onClose={() => setQrOpen(false)}>
           <div className="text-center">
-            {qrDataUrl && <Image src={qrDataUrl} width={280} height={280} unoptimized alt="QR code to open UDoChain Escrow Challenge" className="mx-auto w-full max-w-[280px] rounded-md bg-white p-3" />}
+            {qrDataUrl && <Image src={qrDataUrl} width={280} height={280} unoptimized alt="QR code to open EscrowBet.cool" className="mx-auto w-full max-w-[280px] rounded-md bg-white p-3" />}
             <p className="mt-4 text-sm leading-6 text-slate-300">Scan with your phone camera. No App Store required. Then choose Add to Home Screen.</p>
           </div>
         </Modal>

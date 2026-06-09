@@ -1,9 +1,9 @@
 {
-  "name": "UDoChain Escrow Challenge",
-  "short_name": "Escrow Challenge",
+  "name": "EscrowBet.cool",
+  "short_name": "EscrowBet",
   "description": "World Cup conditional escrow technology demo using virtual EscrowCoins.",
-  "id": "https://escrowbet.cool/",
-  "start_url": "https://escrowbet.cool/",
+  "id": "/",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#030914",

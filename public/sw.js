@@ -1,4 +1,4 @@
-const CACHE_NAME = 'udochain-escrow-v1';
+const CACHE_NAME = 'escrowbet-v2';
 const APP_SHELL = ['/', '/manifest.json', '/icons/icon.svg', '/world-cup-abstract-bg.png'];
 
 self.addEventListener('install', (event) => {

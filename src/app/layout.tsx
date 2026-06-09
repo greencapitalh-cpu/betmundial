@@ -6,8 +6,8 @@ import { LocaleProvider } from "@/components/LocaleProvider";
 import PwaRegister from "@/components/PwaRegister";
 
 export const metadata: Metadata = {
-  title: "UDoChain Escrow Challenge - World Cup Edition",
-  description: "A technology demo for peer-to-peer conditional escrow using virtual EscrowCoins and verified match results.",
+  title: "EscrowBet.cool - World Cup Escrow Challenges",
+  description: "Create peer-to-peer World Cup challenges using virtual EscrowCoins and verified match results. Powered by UDoChain.",
   manifest: "/manifest.json",
 };
 

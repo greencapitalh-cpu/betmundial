@@ -16,10 +16,10 @@ export default function Header() {
           </div>
           <span className="min-w-0 leading-tight">
             <span className="block truncate text-[15px] font-black text-white sm:text-lg">
-              UDoChain <span className="text-[#73f7ae]">Challenge</span>
+              EscrowBet<span className="text-[#73f7ae]">.cool</span>
             </span>
             <span className="block text-[9px] font-bold uppercase tracking-[0.16em] text-slate-400">
-              Escrow protocol · World Cup
+              World Cup escrow challenges
             </span>
           </span>
         </Link>
