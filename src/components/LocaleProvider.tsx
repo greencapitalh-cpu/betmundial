@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 
 export type Locale = 'en' | 'es' | 'pt' | 'fr';
@@ -20,17 +20,35 @@ export const localeNames: Record<Locale, string> = {
 };
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(() => {
-    if (typeof window === 'undefined') return 'en';
-    const saved = window.localStorage.getItem('udochain-escrow-locale') as Locale | null;
-    return saved && saved in localeNames ? saved : 'en';
-  });
+  const [locale, setLocaleState] = useState<Locale>('en');
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const saved = (
+        window.localStorage.getItem('escrowbet-locale')
+        || window.localStorage.getItem('udochain-escrow-locale')
+      ) as Locale | null;
+      const browserLocale = window.navigator.language.slice(0, 2) as Locale;
+      setLocaleState(
+        saved && saved in localeNames
+          ? saved
+          : browserLocale in localeNames
+            ? browserLocale
+            : 'en',
+      );
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const value = useMemo<LocaleContextValue>(() => ({
     locale,
     setLocale: (nextLocale) => {
       setLocaleState(nextLocale);
-      window.localStorage.setItem('udochain-escrow-locale', nextLocale);
+      window.localStorage.setItem('escrowbet-locale', nextLocale);
     },
   }), [locale]);
 

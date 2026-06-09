@@ -3,6 +3,7 @@
 import { FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import QRCode from 'qrcode';
 import Image from 'next/image';
+import OnChainWalletPanel from './OnChainWalletPanel';
 import {
   ArrowRight, CalendarDays, CheckCircle2, ChevronRight, CircleDollarSign,
   Clock3, FileCheck2, LockKeyhole, MapPin, QrCode, Search, Share2,
@@ -370,6 +371,7 @@ export default function EscrowChallengeApp() {
           <WalletStat icon={<LockKeyhole size={19} />} label={t.locked} value={wallet?.locked ?? '—'} accent="orange" />
           <WalletStat icon={<CircleDollarSign size={19} />} label={t.total} value={wallet?.total ?? 1000} accent="blue" />
         </div>
+        <OnChainWalletPanel match={featuredMatch} />
       </section>
 
       {sharedAgreement && (
