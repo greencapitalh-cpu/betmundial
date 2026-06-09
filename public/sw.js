@@ -1,4 +1,4 @@
-const CACHE_NAME = 'escrowbet-v2';
+const CACHE_NAME = 'escrowbet-v4';
 const APP_SHELL = ['/', '/manifest.json', '/icons/icon.svg', '/world-cup-abstract-bg.png'];
 
 self.addEventListener('install', (event) => {
@@ -13,6 +13,10 @@ self.addEventListener('activate', (event) => {
     ),
   );
   self.clients.claim();
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('fetch', (event) => {

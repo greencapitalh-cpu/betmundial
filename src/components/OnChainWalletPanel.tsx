@@ -232,7 +232,7 @@ export default function OnChainWalletPanel({ match }: { match?: MatchSummary | n
   });
 
   return (
-    <section className="onchain-panel">
+    <section id="onchain" className="onchain-panel">
       <div className="onchain-head">
         <div>
           <p className="section-kicker">{t.kicker}</p>

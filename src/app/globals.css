@@ -714,7 +714,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   left: 10px;
   z-index: 50;
   display: none;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   border: 1px solid rgba(255,255,255,.13);
   border-radius: 8px;
   background: rgba(12,15,21,.96);
@@ -735,6 +735,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .mobile-app-nav svg { width: 20px; height: 20px; }
 .mobile-app-nav small { font-size: 9px; font-weight: 850; }
 .mobile-app-nav a:first-child { background: rgba(115,247,174,.08); color: var(--green); }
+.onchain-panel { scroll-margin-top: 88px; }
 
 @keyframes pulse { 50% { opacity: .35; } }
 @keyframes reel-scroll { to { transform: translateX(calc(-50% - 5px)); } }

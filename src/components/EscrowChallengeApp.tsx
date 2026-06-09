@@ -553,6 +553,7 @@ function MobileNav({ onQr }: { onQr: () => void }) {
   return (
     <nav className="mobile-app-nav">
       <a href="#matches"><CalendarDays /><small>Matches</small></a>
+      <a href="#onchain"><WalletCards /><small>Vault</small></a>
       <a href="#agreements"><ShieldCheck /><small>Challenges</small></a>
       <a href="#leaderboard"><Trophy /><small>Ranking</small></a>
       <button onClick={onQr}><QrCode /><small>QR</small></button>
