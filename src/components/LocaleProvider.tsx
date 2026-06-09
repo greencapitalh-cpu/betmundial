@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 
 export type Locale = 'en' | 'es' | 'pt' | 'fr';
@@ -20,18 +20,17 @@ export const localeNames: Record<Locale, string> = {
 };
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>('en');
-
-  useEffect(() => {
-    const saved = window.localStorage.getItem('golazo-locale') as Locale | null;
-    if (saved && saved in localeNames) setLocaleState(saved);
-  }, []);
+  const [locale, setLocaleState] = useState<Locale>(() => {
+    if (typeof window === 'undefined') return 'en';
+    const saved = window.localStorage.getItem('udochain-escrow-locale') as Locale | null;
+    return saved && saved in localeNames ? saved : 'en';
+  });
 
   const value = useMemo<LocaleContextValue>(() => ({
     locale,
     setLocale: (nextLocale) => {
       setLocaleState(nextLocale);
-      window.localStorage.setItem('golazo-locale', nextLocale);
+      window.localStorage.setItem('udochain-escrow-locale', nextLocale);
     },
   }), [locale]);
 

@@ -1,19 +1,11 @@
-export type AccountRole = 'fan' | 'merchant' | 'admin';
-
 export type Account = {
-  id: number;
-  role: AccountRole;
-  name: string;
+  id: string;
   email: string;
-  city?: string;
-  merchant_id?: number | null;
-  access_path?: string;
-  label?: string;
-  permissions?: string[];
-  token?: string;
+  username?: string;
+  token: string;
 };
 
-const STORAGE_KEY = 'golazo-account';
+const STORAGE_KEY = 'udochain-escrow-session';
 
 export function readAccount(): Account | null {
   if (typeof window === 'undefined') return null;
@@ -26,11 +18,9 @@ export function readAccount(): Account | null {
 }
 
 export function saveAccount(account: Account) {
-  if (typeof window === 'undefined') return;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(account));
 }
 
 export function clearAccount() {
-  if (typeof window === 'undefined') return;
   window.localStorage.removeItem(STORAGE_KEY);
 }

@@ -1,12 +1,13 @@
 {
-  "name": "GolazoPromo",
-  "short_name": "GolazoPromo",
-  "description": "World fantasy bet app with coupons and local promotions.",
-  "start_url": "/",
+  "name": "UDoChain Escrow Challenge",
+  "short_name": "Escrow Challenge",
+  "description": "World Cup conditional escrow technology demo using virtual EscrowCoins.",
+  "id": "https://escrowbet.cool/",
+  "start_url": "https://escrowbet.cool/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#050914",
-  "theme_color": "#f7c948",
+  "background_color": "#030914",
+  "theme_color": "#06101d",
   "orientation": "portrait",
   "icons": [
     {
@@ -14,6 +15,21 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "sports", "utilities"],
+  "shortcuts": [
+    {
+      "name": "World Cup Matches",
+      "short_name": "Matches",
+      "url": "/#matches",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "My Agreements",
+      "short_name": "Agreements",
+      "url": "/#agreements",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
     }
   ]
 }

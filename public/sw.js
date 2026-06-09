@@ -1,5 +1,5 @@
-const CACHE_NAME = 'golazopromo-v1';
-const APP_SHELL = ['/', '/manifest.json', '/world-cup-abstract-bg.png'];
+const CACHE_NAME = 'udochain-escrow-v1';
+const APP_SHELL = ['/', '/manifest.json', '/icons/icon.svg', '/world-cup-abstract-bg.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
