@@ -45,6 +45,14 @@ const copy: Record<Locale, Record<string, string>> = {
     open: 'Open challenges', mine: 'My agreements', accept: 'Accept challenge',
     settle: 'Verify result and settle', leaderboard: 'Leaderboard', receipt: 'Receipt',
     empty: 'Nothing here yet.', loginRequired: 'Sign in to continue.',
+    worldCup: 'World Cup 2026', conditional: 'Conditional escrow', loading: 'Loading the World Cup fixture...',
+    how: 'How it works', heroTitle: 'Predict. Lock. Verify. Settle.',
+    heroText: 'A P2P technology demo backed by match evidence and verifiable receipts.',
+    virtualCredits: 'Virtual EscrowCoins', automaticLock: 'Automatic lock', evidenceReceipt: 'Evidence receipt',
+    qr: 'Open by QR', createChallenge: 'Create challenge', scoreHelp: 'Set the exact full-time score.',
+    stakeHelp: 'Both players lock the same virtual amount.', pool: 'Conditional escrow pool',
+    continueGoogle: 'Continue with Google', continueApple: 'Continue with Apple', orEmail: 'or email',
+    openPhone: 'Open on your phone', scanQr: 'Scan with your phone camera. No App Store required. Then choose Add to Home Screen.',
   },
   es: {
     welcome: 'Bienvenido', available: 'Disponible', locked: 'Bloqueado', total: 'Total',
@@ -53,7 +61,15 @@ const copy: Record<Locale, Record<string, string>> = {
     prediction: 'Tu pronostico', stake: 'EscrowCoins por jugador', publish: 'Publicar acuerdo P2P',
     open: 'Challenges abiertos', mine: 'Mis acuerdos', accept: 'Aceptar challenge',
     settle: 'Verificar resultado y liquidar', leaderboard: 'Ranking', receipt: 'Receipt',
-    empty: 'Todavia no hay elementos.', loginRequired: 'Ingresa para continuar.',
+    empty: 'Todavía no hay elementos.', loginRequired: 'Ingresa para continuar.',
+    worldCup: 'Mundial 2026', conditional: 'Escrow condicional', loading: 'Cargando el fixture del Mundial...',
+    how: 'Cómo funciona', heroTitle: 'Predice. Bloquea. Verifica. Liquida.',
+    heroText: 'Una demo tecnológica P2P respaldada por resultados, evidencia y recibos verificables.',
+    virtualCredits: 'EscrowCoins virtuales', automaticLock: 'Bloqueo automático', evidenceReceipt: 'Recibo de evidencia',
+    qr: 'Abrir por QR', createChallenge: 'Crear challenge', scoreHelp: 'Coloca el marcador exacto al finalizar el partido.',
+    stakeHelp: 'Ambos jugadores bloquean el mismo monto virtual.', pool: 'Pool de escrow condicional',
+    continueGoogle: 'Continuar con Google', continueApple: 'Continuar con Apple', orEmail: 'o con email',
+    openPhone: 'Abrir en tu teléfono', scanQr: 'Escanea con la cámara del teléfono. No requiere App Store. Luego elige Agregar a pantalla de inicio.',
   },
   pt: {
     welcome: 'Bem-vindo', available: 'Disponivel', locked: 'Bloqueado', total: 'Total',
@@ -62,7 +78,15 @@ const copy: Record<Locale, Record<string, string>> = {
     prediction: 'Seu palpite', stake: 'EscrowCoins por jogador', publish: 'Publicar acordo P2P',
     open: 'Challenges abertos', mine: 'Meus acordos', accept: 'Aceitar challenge',
     settle: 'Verificar resultado e liquidar', leaderboard: 'Ranking', receipt: 'Receipt',
-    empty: 'Ainda nao ha itens.', loginRequired: 'Entre para continuar.',
+    empty: 'Ainda não há itens.', loginRequired: 'Entre para continuar.',
+    worldCup: 'Copa do Mundo 2026', conditional: 'Escrow condicional', loading: 'Carregando os jogos da Copa...',
+    how: 'Como funciona', heroTitle: 'Preveja. Bloqueie. Verifique. Liquide.',
+    heroText: 'Uma demo tecnológica P2P apoiada por resultados, evidências e recibos verificáveis.',
+    virtualCredits: 'EscrowCoins virtuais', automaticLock: 'Bloqueio automático', evidenceReceipt: 'Recibo de evidência',
+    qr: 'Abrir por QR', createChallenge: 'Criar challenge', scoreHelp: 'Defina o placar exato ao final da partida.',
+    stakeHelp: 'Os dois jogadores bloqueiam o mesmo valor virtual.', pool: 'Pool de escrow condicional',
+    continueGoogle: 'Continuar com Google', continueApple: 'Continuar com Apple', orEmail: 'ou por email',
+    openPhone: 'Abrir no celular', scanQr: 'Escaneie com a câmera do celular. Não requer App Store. Depois escolha Adicionar à tela inicial.',
   },
   fr: {
     welcome: 'Bienvenue', available: 'Disponible', locked: 'Bloque', total: 'Total',
@@ -71,7 +95,15 @@ const copy: Record<Locale, Record<string, string>> = {
     prediction: 'Votre pronostic', stake: 'EscrowCoins par joueur', publish: 'Publier accord P2P',
     open: 'Challenges ouverts', mine: 'Mes accords', accept: 'Accepter le challenge',
     settle: 'Verifier et regler', leaderboard: 'Classement', receipt: 'Receipt',
-    empty: 'Aucun element pour le moment.', loginRequired: 'Connectez-vous pour continuer.',
+    empty: 'Aucun élément pour le moment.', loginRequired: 'Connectez-vous pour continuer.',
+    worldCup: 'Coupe du Monde 2026', conditional: 'Escrow conditionnel', loading: 'Chargement des matchs de la Coupe...',
+    how: 'Fonctionnement', heroTitle: 'Prédisez. Bloquez. Vérifiez. Réglez.',
+    heroText: 'Une démo technologique P2P fondée sur les résultats, les preuves et des reçus vérifiables.',
+    virtualCredits: 'EscrowCoins virtuels', automaticLock: 'Blocage automatique', evidenceReceipt: 'Reçu de preuve',
+    qr: 'Ouvrir par QR', createChallenge: 'Créer un challenge', scoreHelp: 'Indiquez le score exact à la fin du match.',
+    stakeHelp: 'Les deux joueurs bloquent le même montant virtuel.', pool: 'Pool d’escrow conditionnel',
+    continueGoogle: 'Continuer avec Google', continueApple: 'Continuer avec Apple', orEmail: 'ou par email',
+    openPhone: 'Ouvrir sur votre téléphone', scanQr: 'Scannez avec la caméra du téléphone. Aucun App Store requis. Puis choisissez Ajouter à l’écran d’accueil.',
   },
 };
 
@@ -314,8 +346,8 @@ export default function EscrowChallengeApp() {
             <div className="featured-market">
               <div className="featured-overlay">
                 <div className="flex items-center justify-between gap-3">
-                  <span className="live-badge"><span /> World Cup 2026</span>
-                  <span className="protocol-badge"><ShieldCheck size={13} /> Conditional escrow</span>
+                  <span className="live-badge"><span /> {t.worldCup}</span>
+                  <span className="protocol-badge"><ShieldCheck size={13} /> {t.conditional}</span>
                 </div>
                 {featuredMatch ? (
                   <>
@@ -332,23 +364,23 @@ export default function EscrowChallengeApp() {
                       <TeamCrest name={featuredMatch.awayTeam} />
                     </div>
                     <button onClick={() => requireAuth(() => setSelected(featuredMatch))} className="hero-cta">
-                      Create challenge <ArrowRight size={18} />
+                      {t.createChallenge} <ArrowRight size={18} />
                     </button>
                   </>
-                ) : <div className="py-14 text-center text-sm text-slate-400">Loading the World Cup fixture...</div>}
+                ) : <div className="py-14 text-center text-sm text-slate-400">{t.loading}</div>}
               </div>
             </div>
 
             <div className="quick-panel">
               <div>
-                <p className="section-kicker">How it works</p>
-                <h1 className="mt-2 text-2xl font-black leading-tight text-white md:text-3xl">Predict. Lock. Verify. Settle.</h1>
-                <p className="mt-3 text-sm leading-6 text-slate-400">A P2P technology demo backed by match evidence and verifiable receipts.</p>
+                <p className="section-kicker">{t.how}</p>
+                <h1 className="mt-2 text-2xl font-black leading-tight text-white md:text-3xl">{t.heroTitle}</h1>
+                <p className="mt-3 text-sm leading-6 text-slate-400">{t.heroText}</p>
               </div>
               <div className="quick-steps">
-                <QuickStep icon={<CircleDollarSign size={18} />} label="Virtual EscrowCoins" />
-                <QuickStep icon={<LockKeyhole size={18} />} label="Automatic lock" />
-                <QuickStep icon={<FileCheck2 size={18} />} label="Evidence receipt" />
+                <QuickStep icon={<CircleDollarSign size={18} />} label={t.virtualCredits} />
+                <QuickStep icon={<LockKeyhole size={18} />} label={t.automaticLock} />
+                <QuickStep icon={<FileCheck2 size={18} />} label={t.evidenceReceipt} />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {account ? (
@@ -356,7 +388,7 @@ export default function EscrowChallengeApp() {
                 ) : (
                   <button onClick={() => { setAuthMode('login'); setAuthOpen(true); }} className="primary-button">{t.signIn}</button>
                 )}
-                <button onClick={() => setQrOpen(true)} className="secondary-button"><QrCode size={17} /> Open by QR</button>
+                <button onClick={() => setQrOpen(true)} className="secondary-button"><QrCode size={17} /> {t.qr}</button>
               </div>
             </div>
           </div>
@@ -473,15 +505,15 @@ export default function EscrowChallengeApp() {
             <div className="sheet-match-summary"><TeamCrest name={selected.homeTeam} compact /><span>VS</span><TeamCrest name={selected.awayTeam} compact /></div>
             <div className="form-section">
               <label className="form-label">{t.prediction}</label>
-              <p className="form-helper">Set the exact full-time score.</p>
+              <p className="form-helper">{t.scoreHelp}</p>
               <div className="mt-3"><ScoreFields large /></div>
             </div>
             <div className="form-section">
               <label className="form-label">{t.stake}</label>
               <div className="stake-input"><CircleDollarSign size={20} /><input name="stake" type="number" min="1" max="1000" defaultValue="50" /><span>EC</span></div>
-              <p className="form-helper">Both players lock the same virtual amount.</p>
+              <p className="form-helper">{t.stakeHelp}</p>
             </div>
-            <div className="settlement-preview"><LockKeyhole size={18} /><span>Conditional escrow pool</span><strong>2 x stake</strong></div>
+            <div className="settlement-preview"><LockKeyhole size={18} /><span>{t.pool}</span><strong>2 x stake</strong></div>
             <button disabled={busy} className="primary-button w-full">{t.publish} <ArrowRight size={18} /></button>
           </form>
         </Modal>
@@ -490,11 +522,11 @@ export default function EscrowChallengeApp() {
       {authOpen && (
         <Modal title={authMode === 'login' ? t.signIn : t.register} onClose={() => setAuthOpen(false)}>
           <form onSubmit={handleAuth} className="space-y-4">
-            <a href={`${API_URL}/api/auth/google?source=escrow-challenge`} className="social-button bg-white text-slate-950"><strong>G</strong> Continue with Google</a>
+            <a href={`${API_URL}/api/auth/google?source=escrow-challenge`} className="social-button bg-white text-slate-950"><strong>G</strong> {t.continueGoogle}</a>
             {process.env.NEXT_PUBLIC_APPLE_AUTH_ENABLED === 'true' && (
-              <a href={`${API_URL}/api/auth/apple?source=escrow-challenge`} className="social-button bg-black text-white">Continue with Apple</a>
+              <a href={`${API_URL}/api/auth/apple?source=escrow-challenge`} className="social-button bg-black text-white">{t.continueApple}</a>
             )}
-            <div className="form-divider"><span />or email<span /></div>
+            <div className="form-divider"><span />{t.orEmail}<span /></div>
             <div><label className="form-label">{t.email}</label><input name="email" type="email" autoComplete="email" required className="form-field mt-2 w-full" /></div>
             <div><label className="form-label">{t.password}</label><input name="password" type="password" autoComplete={authMode === 'login' ? 'current-password' : 'new-password'} minLength={6} required className="form-field mt-2 w-full" /></div>
             <button disabled={busy} className="primary-button w-full">{authMode === 'login' ? t.signIn : t.register}</button>
@@ -504,10 +536,10 @@ export default function EscrowChallengeApp() {
       )}
 
       {qrOpen && (
-        <Modal title="Open on your phone" onClose={() => setQrOpen(false)}>
+        <Modal title={t.openPhone} onClose={() => setQrOpen(false)}>
           <div className="text-center">
             {qrDataUrl && <Image src={qrDataUrl} width={280} height={280} unoptimized alt="QR code to open EscrowBet.cool" className="mx-auto w-full max-w-[280px] rounded-md bg-white p-3" />}
-            <p className="mt-4 text-sm leading-6 text-slate-300">Scan with your phone camera. No App Store required. Then choose Add to Home Screen.</p>
+            <p className="mt-4 text-sm leading-6 text-slate-300">{t.scanQr}</p>
           </div>
         </Modal>
       )}
