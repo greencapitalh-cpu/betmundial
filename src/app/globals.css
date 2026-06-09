@@ -409,6 +409,39 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
 }
 .onchain-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.onchain-network-row {
+  display: grid;
+  grid-template-columns: minmax(220px, .45fr) 1fr;
+  gap: 12px;
+  margin-top: 18px;
+}
+.onchain-network-row label { display: grid; gap: 8px; }
+.onchain-contract-state {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(255,255,255,.025);
+  padding: 12px 14px;
+}
+.onchain-contract-state span { color: #7d8999; font-size: 9px; font-weight: 900; text-transform: uppercase; }
+.onchain-contract-state a { display: flex; align-items: center; gap: 6px; color: var(--green); font-family: var(--font-mono); font-size: 12px; }
+.onchain-contract-state strong { color: #7d8999; font-family: var(--font-mono); font-size: 11px; }
+.onchain-deploy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 12px;
+  border: 1px dashed rgba(94,215,255,.28);
+  border-radius: 6px;
+  background: rgba(94,215,255,.045);
+  padding: 13px 14px;
+}
+.onchain-deploy p { color: #b7c4d3; font-size: 12px; line-height: 1.5; }
 .onchain-grid { display: grid; grid-template-columns: .45fr 1fr; gap: 12px; margin-top: 18px; }
 .onchain-shared {
   display: grid;
@@ -720,6 +753,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .wallet-stat strong { font-size: 17px; }
   .wallet-stat small { display: none; }
   .onchain-head { align-items: stretch; flex-direction: column; }
+  .onchain-network-row { grid-template-columns: 1fr; }
+  .onchain-contract-state { align-items: flex-start; flex-direction: column; }
+  .onchain-deploy { align-items: stretch; flex-direction: column; }
   .onchain-grid { grid-template-columns: 1fr; }
   .match-grid { grid-template-columns: 1fr; }
   .market-card { min-height: 175px; }
