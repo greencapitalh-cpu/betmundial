@@ -44,8 +44,8 @@ type MatchSummary = {
 
 const walletCopy: Record<Locale, Record<string, string>> = {
   en: {
-    kicker: 'Live technology demo', title: 'On-chain testnet escrow',
-    subtitle: 'Deploy and fund a real EVM vault using test assets only.', connect: 'Connect wallet',
+    kicker: 'Live technology proof', title: 'Test the escrow with two wallets',
+    subtitle: 'Deploy a real EVM vault, fund one side, share the agreement, and let a second wallet lock the matching test deposit.', connect: 'Connect wallet',
     deploy: 'Deploy vault', deploying: 'Deploying vault...', network: 'Test network',
     stake: 'Test stake', invite: 'Invite wallet (optional)', placeholder: '0x... or leave open',
     fund: 'Fund challenge', faucet: 'Get test funds', shared: 'Shared vault challenge',
@@ -54,11 +54,11 @@ const walletCopy: Record<Locale, Record<string, string>> = {
     pending: 'Deploy the vault once, then create wallet-signed challenges.', select: 'Select a World Cup match first.',
     funded: 'Challenge funded on-chain. Share link copied.', missing: 'Deploy or open a shared vault first.',
     notFound: 'Shared challenge not found.', accepted: 'Accepted. Both deposits are locked in the vault.',
-    verified: 'Verified deposit', failed: 'Wallet transaction failed.', official: 'Contract',
+    verified: 'Verified deposit', failed: 'Wallet transaction failed.', official: 'Contract', notDeployed: 'Not deployed',
   },
   es: {
-    kicker: 'Demo tecnológica en vivo', title: 'Escrow on-chain en testnet',
-    subtitle: 'Despliega y fondea un vault EVM real usando únicamente activos de prueba.', connect: 'Conectar billetera',
+    kicker: 'Prueba tecnológica en vivo', title: 'Prueba el escrow con dos billeteras',
+    subtitle: 'Despliega un vault EVM real, fondea una parte, comparte el acuerdo y permite que una segunda billetera bloquee el mismo depósito de prueba.', connect: 'Conectar billetera',
     deploy: 'Desplegar vault', deploying: 'Desplegando vault...', network: 'Red de prueba',
     stake: 'Depósito de prueba', invite: 'Invitar billetera (opcional)', placeholder: '0x... o dejar abierto',
     fund: 'Fondear challenge', faucet: 'Obtener fondos de prueba', shared: 'Challenge compartido del vault',
@@ -67,11 +67,11 @@ const walletCopy: Record<Locale, Record<string, string>> = {
     pending: 'Despliega el vault una vez y luego crea challenges firmados con billetera.', select: 'Selecciona primero un partido del Mundial.',
     funded: 'Challenge fondeado on-chain. Enlace copiado.', missing: 'Primero despliega o abre un vault compartido.',
     notFound: 'No se encontró el challenge compartido.', accepted: 'Aceptado. Ambos depósitos están bloqueados en el vault.',
-    verified: 'Depósito verificado', failed: 'Falló la transacción de la billetera.', official: 'Contrato',
+    verified: 'Depósito verificado', failed: 'Falló la transacción de la billetera.', official: 'Contrato', notDeployed: 'Sin desplegar',
   },
   pt: {
-    kicker: 'Demo tecnológica ao vivo', title: 'Escrow on-chain em testnet',
-    subtitle: 'Implante e financie um vault EVM real usando somente ativos de teste.', connect: 'Conectar carteira',
+    kicker: 'Prova tecnológica ao vivo', title: 'Teste o escrow com duas carteiras',
+    subtitle: 'Implante um vault EVM real, financie uma parte, compartilhe o acordo e permita que uma segunda carteira bloqueie o mesmo depósito de teste.', connect: 'Conectar carteira',
     deploy: 'Implantar vault', deploying: 'Implantando vault...', network: 'Rede de teste',
     stake: 'Depósito de teste', invite: 'Convidar carteira (opcional)', placeholder: '0x... ou deixar aberto',
     fund: 'Financiar challenge', faucet: 'Obter fundos de teste', shared: 'Challenge compartilhado do vault',
@@ -80,11 +80,11 @@ const walletCopy: Record<Locale, Record<string, string>> = {
     pending: 'Implante o vault uma vez e depois crie challenges assinados pela carteira.', select: 'Selecione primeiro um jogo da Copa.',
     funded: 'Challenge financiado on-chain. Link copiado.', missing: 'Primeiro implante ou abra um vault compartilhado.',
     notFound: 'Challenge compartilhado não encontrado.', accepted: 'Aceito. Ambos os depósitos estão bloqueados no vault.',
-    verified: 'Depósito verificado', failed: 'Falha na transação da carteira.', official: 'Contrato',
+    verified: 'Depósito verificado', failed: 'Falha na transação da carteira.', official: 'Contrato', notDeployed: 'Não implantado',
   },
   fr: {
-    kicker: 'Démo technologique en direct', title: 'Escrow on-chain sur testnet',
-    subtitle: 'Déployez et financez un vault EVM réel avec des actifs de test uniquement.', connect: 'Connecter le portefeuille',
+    kicker: 'Preuve technologique en direct', title: 'Testez l’escrow avec deux portefeuilles',
+    subtitle: 'Déployez un vault EVM réel, financez une partie, partagez l’accord et laissez un second portefeuille bloquer le même dépôt de test.', connect: 'Connecter le portefeuille',
     deploy: 'Déployer le vault', deploying: 'Déploiement du vault...', network: 'Réseau de test',
     stake: 'Dépôt de test', invite: 'Inviter un portefeuille (optionnel)', placeholder: '0x... ou laisser ouvert',
     fund: 'Financer le challenge', faucet: 'Obtenir des fonds de test', shared: 'Challenge partagé du vault',
@@ -93,7 +93,7 @@ const walletCopy: Record<Locale, Record<string, string>> = {
     pending: 'Déployez le vault une fois, puis créez des challenges signés par portefeuille.', select: 'Sélectionnez d’abord un match de la Coupe.',
     funded: 'Challenge financé on-chain. Lien copié.', missing: 'Déployez ou ouvrez d’abord un vault partagé.',
     notFound: 'Challenge partagé introuvable.', accepted: 'Accepté. Les deux dépôts sont bloqués dans le vault.',
-    verified: 'Dépôt vérifié', failed: 'La transaction du portefeuille a échoué.', official: 'Contrat',
+    verified: 'Dépôt vérifié', failed: 'La transaction du portefeuille a échoué.', official: 'Contrat', notDeployed: 'Non déployé',
   },
 };
 
@@ -263,7 +263,7 @@ export default function OnChainWalletPanel({ match }: { match?: MatchSummary | n
         </label>
         <div className="onchain-contract-state">
           <span>{t.official}</span>
-          {vaultAddress ? <a href={explorerUrl} target="_blank" rel="noreferrer">{vaultAddress.slice(0, 10)}...{vaultAddress.slice(-6)} <ExternalLink size={13} /></a> : <strong>Not deployed</strong>}
+          {vaultAddress ? <a href={explorerUrl} target="_blank" rel="noreferrer">{vaultAddress.slice(0, 10)}...{vaultAddress.slice(-6)} <ExternalLink size={13} /></a> : <strong>{t.notDeployed}</strong>}
         </div>
       </div>
 

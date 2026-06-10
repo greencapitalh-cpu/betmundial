@@ -5,13 +5,11 @@ import Link from 'next/link';
 import { Check, ChevronDown, Globe2, ShieldCheck } from 'lucide-react';
 import { localeNames, useLocale, type Locale } from './LocaleProvider';
 
-const localeFlags: Record<Locale, string> = { en: 'US', es: 'ES', pt: 'BR', fr: 'FR' };
-
-const headerCopy: Record<Locale, { tagline: string; matches: string; agreements: string; leaderboard: string; language: string }> = {
-  en: { tagline: 'World Cup escrow challenges', matches: 'Matches', agreements: 'Agreements', leaderboard: 'Leaderboard', language: 'Language' },
-  es: { tagline: 'Challenges escrow del Mundial', matches: 'Partidos', agreements: 'Acuerdos', leaderboard: 'Ranking', language: 'Idioma' },
-  pt: { tagline: 'Challenges escrow da Copa', matches: 'Jogos', agreements: 'Acordos', leaderboard: 'Ranking', language: 'Idioma' },
-  fr: { tagline: 'Challenges escrow de la Coupe', matches: 'Matchs', agreements: 'Accords', leaderboard: 'Classement', language: 'Langue' },
+const headerCopy: Record<Locale, { tagline: string; matches: string; vault: string; agreements: string; leaderboard: string; language: string }> = {
+  en: { tagline: 'P2P conditional escrow', matches: 'Matches', vault: 'Live vault', agreements: 'Agreements', leaderboard: 'Leaderboard', language: 'Language' },
+  es: { tagline: 'Escrow condicional P2P', matches: 'Partidos', vault: 'Vault en vivo', agreements: 'Acuerdos', leaderboard: 'Ranking', language: 'Idioma' },
+  pt: { tagline: 'Escrow condicional P2P', matches: 'Jogos', vault: 'Vault ao vivo', agreements: 'Acordos', leaderboard: 'Ranking', language: 'Idioma' },
+  fr: { tagline: 'Escrow conditionnel P2P', matches: 'Matchs', vault: 'Vault en direct', agreements: 'Accords', leaderboard: 'Classement', language: 'Langue' },
 };
 
 export default function Header() {
@@ -50,6 +48,7 @@ export default function Header() {
 
         <nav className="hidden items-center gap-1 md:flex">
           <Link href="/#matches" className="escrow-nav-link">{t.matches}</Link>
+          <Link href="/#onchain" className="escrow-nav-link">{t.vault}</Link>
           <Link href="/#agreements" className="escrow-nav-link">{t.agreements}</Link>
           <Link href="/#leaderboard" className="escrow-nav-link">{t.leaderboard}</Link>
         </nav>
@@ -83,7 +82,6 @@ export default function Header() {
                     setLanguageOpen(false);
                   }}
                 >
-                  <span className={`language-flag language-flag-${key}`} aria-hidden="true">{localeFlags[key]}</span>
                   <span>
                     <strong>{localeNames[key]}</strong>
                     <small>{key.toUpperCase()}</small>

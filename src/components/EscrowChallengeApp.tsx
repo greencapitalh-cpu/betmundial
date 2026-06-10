@@ -29,13 +29,6 @@ type Leader = { _id: string; wins: number; escrowCoinsWon: number };
 
 const API_URL = (process.env.NEXT_PUBLIC_UDOCHAIN_API_URL || 'https://api.udochain.com').replace(/\/$/, '');
 const BET_API_URL = (process.env.NEXT_PUBLIC_BET_API_URL || 'https://bet2back-production.up.railway.app').replace(/\/$/, '');
-const DISCLAIMERS = [
-  'No real money.',
-  'EscrowCoins are virtual credits.',
-  'This is a technology demo for conditional escrow.',
-  'UDoChain does not operate betting or gambling.',
-];
-
 const copy: Record<Locale, Record<string, string>> = {
   en: {
     welcome: 'Welcome', available: 'Available', locked: 'Locked', total: 'Total',
@@ -46,13 +39,38 @@ const copy: Record<Locale, Record<string, string>> = {
     settle: 'Verify result and settle', leaderboard: 'Leaderboard', receipt: 'Receipt',
     empty: 'Nothing here yet.', loginRequired: 'Sign in to continue.',
     worldCup: 'World Cup 2026', conditional: 'Conditional escrow', loading: 'Loading the World Cup fixture...',
-    how: 'How it works', heroTitle: 'Predict. Lock. Verify. Settle.',
-    heroText: 'A P2P technology demo backed by match evidence and verifiable receipts.',
-    virtualCredits: 'Virtual EscrowCoins', automaticLock: 'Automatic lock', evidenceReceipt: 'Evidence receipt',
+    how: 'P2P escrow infrastructure', heroTitle: 'P2P agreements with verifiable settlement.',
+    heroText: 'Two people agree on an outcome, lock equal value in a neutral escrow, and let verified data trigger settlement and a final receipt.',
+    useCase: 'The World Cup is the live demo. The infrastructure can support any agreement with an objective, verifiable outcome.',
+    virtualCredits: 'Agree on the condition', automaticLock: 'Both parties lock value', evidenceReceipt: 'Verify and settle',
     qr: 'Open by QR', createChallenge: 'Create challenge', scoreHelp: 'Set the exact full-time score.',
     stakeHelp: 'Both players lock the same virtual amount.', pool: 'Conditional escrow pool',
     continueGoogle: 'Continue with Google', continueApple: 'Continue with Apple', orEmail: 'or email',
     openPhone: 'Open on your phone', scanQr: 'Scan with your phone camera. No App Store required. Then choose Add to Home Screen.',
+    sessionVerified: 'Verified UDoChain session', guestHint: 'Explore freely. Sign in only when creating an agreement.',
+    flowKicker: 'What investors are seeing', flowTitle: 'A complete conditional escrow lifecycle',
+    flowText: 'EscrowBet.cool demonstrates the UDoChain protocol through a simple World Cup challenge between two peers.',
+    visualKicker: 'Peer-to-peer by design', visualTitle: 'Two people. One neutral agreement layer.',
+    visualText: 'Neither participant controls the other party’s locked value. UDoChain coordinates the condition, evidence, settlement and receipt.',
+    stepAgree: '1. Agreement', stepAgreeText: 'Party A defines the match, prediction and amount. Party B reviews and accepts the same terms.',
+    stepLock: '2. Neutral lock', stepLockText: 'Equal value from both parties is reserved and unavailable while the agreement is active.',
+    stepVerify: '3. Objective verification', stepVerifyText: 'The final match result becomes the external evidence used to resolve the condition.',
+    stepSettle: '4. Settlement + receipt', stepSettleText: 'Value is released under the agreed rule and a verifiable receipt records the outcome.',
+    reusable: 'Reusable beyond sports', demoLayer: 'Virtual-credit demo + live EVM testnet',
+    marketKicker: 'World Cup demo scenario', events: 'matches', all: 'All', groups: 'Groups',
+    round32: 'Round of 32', round16: 'Round of 16', quarters: 'Quarterfinals', semis: 'Semifinals', final: 'Final',
+    group: 'Group', match: 'Match', venueTba: 'Venue TBA', challenge: 'Create agreement',
+    sharedChallenge: 'Shared P2P agreement', invites: 'invites you to an escrow pool of', viewChallenge: 'Review agreement',
+    share: 'Share', linkCopied: 'Agreement link copied.', verifiedSettlements: 'Verified settlements', wins: 'wins',
+    predictionLabel: 'Prediction', stakeLabel: 'Locked per party', poolLabel: 'Escrow pool', close: 'Close',
+    navMatches: 'Matches', navVault: 'Vault', navChallenges: 'Agreements', navRanking: 'Ranking', navQr: 'QR',
+    techKicker: 'UDoChain infrastructure', techTitle: 'One protocol, multiple escrow use cases',
+    tech1Title: 'Conditional Escrow', tech1Text: 'Lock value until independently verifiable conditions are completed.',
+    tech2Title: 'Evidence Layer', tech2Text: 'Preserve structured evidence and its integrity through cryptographic hashes.',
+    tech3Title: 'Programmable Agreements', tech3Text: 'Turn peer commitments into traceable execution workflows.',
+    tech4Title: 'Verifiable Receipts', tech4Text: 'Produce final proof for every conditional settlement.',
+    disclaimer1: 'No real money.', disclaimer2: 'EscrowCoins are virtual credits.',
+    disclaimer3: 'This is a technology demo for conditional escrow.', disclaimer4: 'UDoChain does not operate betting or gambling.',
   },
   es: {
     welcome: 'Bienvenido', available: 'Disponible', locked: 'Bloqueado', total: 'Total',
@@ -63,13 +81,38 @@ const copy: Record<Locale, Record<string, string>> = {
     settle: 'Verificar resultado y liquidar', leaderboard: 'Ranking', receipt: 'Receipt',
     empty: 'Todavía no hay elementos.', loginRequired: 'Ingresa para continuar.',
     worldCup: 'Mundial 2026', conditional: 'Escrow condicional', loading: 'Cargando el fixture del Mundial...',
-    how: 'Cómo funciona', heroTitle: 'Predice. Bloquea. Verifica. Liquida.',
-    heroText: 'Una demo tecnológica P2P respaldada por resultados, evidencia y recibos verificables.',
-    virtualCredits: 'EscrowCoins virtuales', automaticLock: 'Bloqueo automático', evidenceReceipt: 'Recibo de evidencia',
+    how: 'Infraestructura de escrow P2P', heroTitle: 'Acuerdos P2P con liquidación verificable.',
+    heroText: 'Dos personas acuerdan un resultado, bloquean el mismo valor en un escrow neutral y un dato verificado activa la liquidación y el recibo final.',
+    useCase: 'El Mundial es la demostración en vivo. La infraestructura puede aplicarse a cualquier acuerdo con un resultado objetivo y verificable.',
+    virtualCredits: 'Acordar la condición', automaticLock: 'Ambas partes bloquean valor', evidenceReceipt: 'Verificar y liquidar',
     qr: 'Abrir por QR', createChallenge: 'Crear challenge', scoreHelp: 'Coloca el marcador exacto al finalizar el partido.',
     stakeHelp: 'Ambos jugadores bloquean el mismo monto virtual.', pool: 'Pool de escrow condicional',
     continueGoogle: 'Continuar con Google', continueApple: 'Continuar con Apple', orEmail: 'o con email',
     openPhone: 'Abrir en tu teléfono', scanQr: 'Escanea con la cámara del teléfono. No requiere App Store. Luego elige Agregar a pantalla de inicio.',
+    sessionVerified: 'Sesión verificada por UDoChain', guestHint: 'Explora libremente. Solo debes ingresar para crear un acuerdo.',
+    flowKicker: 'Lo que está viendo el inversor', flowTitle: 'Un ciclo completo de escrow condicional',
+    flowText: 'EscrowBet.cool demuestra el protocolo UDoChain mediante un challenge simple del Mundial entre dos personas.',
+    visualKicker: 'Diseñado para acuerdos entre personas', visualTitle: 'Dos personas. Una capa neutral de acuerdo.',
+    visualText: 'Ningún participante controla el valor bloqueado por la otra parte. UDoChain coordina la condición, evidencia, liquidación y recibo.',
+    stepAgree: '1. Acuerdo', stepAgreeText: 'La parte A define partido, pronóstico y monto. La parte B revisa y acepta exactamente las mismas condiciones.',
+    stepLock: '2. Bloqueo neutral', stepLockText: 'El mismo valor de ambas partes queda reservado y no puede utilizarse mientras el acuerdo está activo.',
+    stepVerify: '3. Verificación objetiva', stepVerifyText: 'El resultado final del partido se convierte en la evidencia externa que resuelve la condición.',
+    stepSettle: '4. Liquidación + recibo', stepSettleText: 'El valor se libera según la regla acordada y un recibo verificable registra el resultado.',
+    reusable: 'Reutilizable más allá del deporte', demoLayer: 'Demo con créditos virtuales + testnet EVM en vivo',
+    marketKicker: 'Escenario demo del Mundial', events: 'partidos', all: 'Todos', groups: 'Grupos',
+    round32: 'Dieciseisavos', round16: 'Octavos', quarters: 'Cuartos', semis: 'Semifinales', final: 'Final',
+    group: 'Grupo', match: 'Partido', venueTba: 'Sede por confirmar', challenge: 'Crear acuerdo',
+    sharedChallenge: 'Acuerdo P2P compartido', invites: 'te invita a un pool de escrow de', viewChallenge: 'Revisar acuerdo',
+    share: 'Compartir', linkCopied: 'Enlace del acuerdo copiado.', verifiedSettlements: 'Liquidaciones verificadas', wins: 'aciertos',
+    predictionLabel: 'Pronóstico', stakeLabel: 'Bloqueado por parte', poolLabel: 'Pool de escrow', close: 'Cerrar',
+    navMatches: 'Partidos', navVault: 'Vault', navChallenges: 'Acuerdos', navRanking: 'Ranking', navQr: 'QR',
+    techKicker: 'Infraestructura UDoChain', techTitle: 'Un protocolo, múltiples usos de escrow',
+    tech1Title: 'Escrow condicional', tech1Text: 'Bloquea valor hasta que se cumplan condiciones verificables de forma independiente.',
+    tech2Title: 'Capa de evidencia', tech2Text: 'Preserva evidencia estructurada y su integridad mediante hashes criptográficos.',
+    tech3Title: 'Acuerdos programables', tech3Text: 'Convierte compromisos entre personas en flujos de ejecución trazables.',
+    tech4Title: 'Recibos verificables', tech4Text: 'Genera una prueba final para cada liquidación condicional.',
+    disclaimer1: 'No utiliza dinero real.', disclaimer2: 'Los EscrowCoins son créditos virtuales.',
+    disclaimer3: 'Esta es una demo tecnológica de escrow condicional.', disclaimer4: 'UDoChain no opera apuestas ni juegos de azar.',
   },
   pt: {
     welcome: 'Bem-vindo', available: 'Disponivel', locked: 'Bloqueado', total: 'Total',
@@ -80,13 +123,38 @@ const copy: Record<Locale, Record<string, string>> = {
     settle: 'Verificar resultado e liquidar', leaderboard: 'Ranking', receipt: 'Receipt',
     empty: 'Ainda não há itens.', loginRequired: 'Entre para continuar.',
     worldCup: 'Copa do Mundo 2026', conditional: 'Escrow condicional', loading: 'Carregando os jogos da Copa...',
-    how: 'Como funciona', heroTitle: 'Preveja. Bloqueie. Verifique. Liquide.',
-    heroText: 'Uma demo tecnológica P2P apoiada por resultados, evidências e recibos verificáveis.',
-    virtualCredits: 'EscrowCoins virtuais', automaticLock: 'Bloqueio automático', evidenceReceipt: 'Recibo de evidência',
+    how: 'Infraestrutura de escrow P2P', heroTitle: 'Acordos P2P com liquidação verificável.',
+    heroText: 'Duas pessoas concordam com um resultado, bloqueiam o mesmo valor em um escrow neutro e um dado verificado ativa a liquidação e o recibo final.',
+    useCase: 'A Copa do Mundo é a demonstração ao vivo. A infraestrutura pode atender qualquer acordo com resultado objetivo e verificável.',
+    virtualCredits: 'Definir a condição', automaticLock: 'Ambas as partes bloqueiam valor', evidenceReceipt: 'Verificar e liquidar',
     qr: 'Abrir por QR', createChallenge: 'Criar challenge', scoreHelp: 'Defina o placar exato ao final da partida.',
     stakeHelp: 'Os dois jogadores bloqueiam o mesmo valor virtual.', pool: 'Pool de escrow condicional',
     continueGoogle: 'Continuar com Google', continueApple: 'Continuar com Apple', orEmail: 'ou por email',
     openPhone: 'Abrir no celular', scanQr: 'Escaneie com a câmera do celular. Não requer App Store. Depois escolha Adicionar à tela inicial.',
+    sessionVerified: 'Sessão verificada pela UDoChain', guestHint: 'Explore livremente. Entre apenas quando quiser criar um acordo.',
+    flowKicker: 'O que o investidor está vendo', flowTitle: 'Um ciclo completo de escrow condicional',
+    flowText: 'EscrowBet.cool demonstra o protocolo UDoChain através de um desafio simples da Copa entre duas pessoas.',
+    visualKicker: 'Criado para acordos entre pessoas', visualTitle: 'Duas pessoas. Uma camada neutra de acordo.',
+    visualText: 'Nenhum participante controla o valor bloqueado pela outra parte. A UDoChain coordena condição, evidência, liquidação e recibo.',
+    stepAgree: '1. Acordo', stepAgreeText: 'A parte A define jogo, palpite e valor. A parte B revisa e aceita exatamente os mesmos termos.',
+    stepLock: '2. Bloqueio neutro', stepLockText: 'O mesmo valor de ambas as partes fica reservado e indisponível enquanto o acordo estiver ativo.',
+    stepVerify: '3. Verificação objetiva', stepVerifyText: 'O resultado final do jogo se torna a evidência externa usada para resolver a condição.',
+    stepSettle: '4. Liquidação + recibo', stepSettleText: 'O valor é liberado conforme a regra acordada e um recibo verificável registra o resultado.',
+    reusable: 'Reutilizável além dos esportes', demoLayer: 'Demo com créditos virtuais + testnet EVM ao vivo',
+    marketKicker: 'Cenário demo da Copa', events: 'jogos', all: 'Todos', groups: 'Grupos',
+    round32: 'Fase de 32', round16: 'Oitavas', quarters: 'Quartas', semis: 'Semifinais', final: 'Final',
+    group: 'Grupo', match: 'Jogo', venueTba: 'Local a confirmar', challenge: 'Criar acordo',
+    sharedChallenge: 'Acordo P2P compartilhado', invites: 'convida você para um pool de escrow de', viewChallenge: 'Revisar acordo',
+    share: 'Compartilhar', linkCopied: 'Link do acordo copiado.', verifiedSettlements: 'Liquidações verificadas', wins: 'acertos',
+    predictionLabel: 'Palpite', stakeLabel: 'Bloqueado por parte', poolLabel: 'Pool de escrow', close: 'Fechar',
+    navMatches: 'Jogos', navVault: 'Vault', navChallenges: 'Acordos', navRanking: 'Ranking', navQr: 'QR',
+    techKicker: 'Infraestrutura UDoChain', techTitle: 'Um protocolo, múltiplos usos de escrow',
+    tech1Title: 'Escrow condicional', tech1Text: 'Bloqueia valor até que condições verificáveis de forma independente sejam concluídas.',
+    tech2Title: 'Camada de evidência', tech2Text: 'Preserva evidências estruturadas e sua integridade por meio de hashes criptográficos.',
+    tech3Title: 'Acordos programáveis', tech3Text: 'Transforma compromissos entre pessoas em fluxos de execução rastreáveis.',
+    tech4Title: 'Recibos verificáveis', tech4Text: 'Produz uma prova final para cada liquidação condicional.',
+    disclaimer1: 'Não utiliza dinheiro real.', disclaimer2: 'EscrowCoins são créditos virtuais.',
+    disclaimer3: 'Esta é uma demo tecnológica de escrow condicional.', disclaimer4: 'A UDoChain não opera apostas nem jogos de azar.',
   },
   fr: {
     welcome: 'Bienvenue', available: 'Disponible', locked: 'Bloque', total: 'Total',
@@ -97,13 +165,38 @@ const copy: Record<Locale, Record<string, string>> = {
     settle: 'Verifier et regler', leaderboard: 'Classement', receipt: 'Receipt',
     empty: 'Aucun élément pour le moment.', loginRequired: 'Connectez-vous pour continuer.',
     worldCup: 'Coupe du Monde 2026', conditional: 'Escrow conditionnel', loading: 'Chargement des matchs de la Coupe...',
-    how: 'Fonctionnement', heroTitle: 'Prédisez. Bloquez. Vérifiez. Réglez.',
-    heroText: 'Une démo technologique P2P fondée sur les résultats, les preuves et des reçus vérifiables.',
-    virtualCredits: 'EscrowCoins virtuels', automaticLock: 'Blocage automatique', evidenceReceipt: 'Reçu de preuve',
+    how: 'Infrastructure d’escrow P2P', heroTitle: 'Des accords P2P au règlement vérifiable.',
+    heroText: 'Deux personnes conviennent d’un résultat, bloquent la même valeur dans un escrow neutre, puis une donnée vérifiée déclenche le règlement et le reçu final.',
+    useCase: 'La Coupe du Monde est la démonstration en direct. L’infrastructure peut servir tout accord fondé sur un résultat objectif et vérifiable.',
+    virtualCredits: 'Définir la condition', automaticLock: 'Les deux parties bloquent la valeur', evidenceReceipt: 'Vérifier et régler',
     qr: 'Ouvrir par QR', createChallenge: 'Créer un challenge', scoreHelp: 'Indiquez le score exact à la fin du match.',
     stakeHelp: 'Les deux joueurs bloquent le même montant virtuel.', pool: 'Pool d’escrow conditionnel',
     continueGoogle: 'Continuer avec Google', continueApple: 'Continuer avec Apple', orEmail: 'ou par email',
     openPhone: 'Ouvrir sur votre téléphone', scanQr: 'Scannez avec la caméra du téléphone. Aucun App Store requis. Puis choisissez Ajouter à l’écran d’accueil.',
+    sessionVerified: 'Session vérifiée par UDoChain', guestHint: 'Explorez librement. Connectez-vous uniquement pour créer un accord.',
+    flowKicker: 'Ce que voit l’investisseur', flowTitle: 'Un cycle complet d’escrow conditionnel',
+    flowText: 'EscrowBet.cool démontre le protocole UDoChain à travers un défi simple de Coupe du Monde entre deux personnes.',
+    visualKicker: 'Conçu pour les accords entre pairs', visualTitle: 'Deux personnes. Une couche d’accord neutre.',
+    visualText: 'Aucun participant ne contrôle la valeur bloquée par l’autre. UDoChain coordonne la condition, la preuve, le règlement et le reçu.',
+    stepAgree: '1. Accord', stepAgreeText: 'La partie A définit le match, le pronostic et le montant. La partie B examine et accepte les mêmes conditions.',
+    stepLock: '2. Blocage neutre', stepLockText: 'La même valeur de chaque partie est réservée et reste indisponible tant que l’accord est actif.',
+    stepVerify: '3. Vérification objective', stepVerifyText: 'Le résultat final du match devient la preuve externe utilisée pour résoudre la condition.',
+    stepSettle: '4. Règlement + reçu', stepSettleText: 'La valeur est libérée selon la règle convenue et un reçu vérifiable enregistre le résultat.',
+    reusable: 'Réutilisable au-delà du sport', demoLayer: 'Démo en crédits virtuels + testnet EVM en direct',
+    marketKicker: 'Scénario démo de la Coupe', events: 'matchs', all: 'Tous', groups: 'Groupes',
+    round32: 'Tour des 32', round16: 'Huitièmes', quarters: 'Quarts', semis: 'Demi-finales', final: 'Finale',
+    group: 'Groupe', match: 'Match', venueTba: 'Lieu à confirmer', challenge: 'Créer un accord',
+    sharedChallenge: 'Accord P2P partagé', invites: 'vous invite à un pool d’escrow de', viewChallenge: 'Examiner l’accord',
+    share: 'Partager', linkCopied: 'Lien de l’accord copié.', verifiedSettlements: 'Règlements vérifiés', wins: 'réussites',
+    predictionLabel: 'Pronostic', stakeLabel: 'Bloqué par partie', poolLabel: 'Pool d’escrow', close: 'Fermer',
+    navMatches: 'Matchs', navVault: 'Vault', navChallenges: 'Accords', navRanking: 'Classement', navQr: 'QR',
+    techKicker: 'Infrastructure UDoChain', techTitle: 'Un protocole, plusieurs usages d’escrow',
+    tech1Title: 'Escrow conditionnel', tech1Text: 'Bloque la valeur jusqu’à l’accomplissement de conditions vérifiables indépendamment.',
+    tech2Title: 'Couche de preuve', tech2Text: 'Préserve les preuves structurées et leur intégrité grâce aux empreintes cryptographiques.',
+    tech3Title: 'Accords programmables', tech3Text: 'Transforme les engagements entre personnes en workflows d’exécution traçables.',
+    tech4Title: 'Reçus vérifiables', tech4Text: 'Produit une preuve finale pour chaque règlement conditionnel.',
+    disclaimer1: 'Aucun argent réel.', disclaimer2: 'Les EscrowCoins sont des crédits virtuels.',
+    disclaimer3: 'Ceci est une démo technologique d’escrow conditionnel.', disclaimer4: 'UDoChain n’opère ni paris ni jeux d’argent.',
   },
 };
 
@@ -140,6 +233,7 @@ function normalizeBetMatch(match: Record<string, unknown>): Match {
 export default function EscrowChallengeApp() {
   const { locale } = useLocale();
   const t = copy[locale];
+  const disclaimers = [t.disclaimer1, t.disclaimer2, t.disclaimer3, t.disclaimer4];
   const [account, setAccount] = useState<Account | null>(null);
   const [matches, setMatches] = useState<Match[]>([]);
   const [openAgreements, setOpenAgreements] = useState<Agreement[]>([]);
@@ -320,7 +414,7 @@ export default function EscrowChallengeApp() {
       return;
     }
     await navigator.clipboard.writeText(url);
-    setNotice('Challenge link copied.');
+    setNotice(t.linkCopied);
   }
 
   return (
@@ -335,7 +429,7 @@ export default function EscrowChallengeApp() {
                   {account ? `${t.welcome}, ${account.email}` : 'EscrowBet.cool World Cup'}
                 </p>
                 <p className="text-[11px] text-slate-400">
-                  {account ? 'Verified UDoChain session' : 'Create challenges with virtual credits'}
+                  {account ? t.sessionVerified : t.guestHint}
                 </p>
               </div>
             </div>
@@ -376,6 +470,7 @@ export default function EscrowChallengeApp() {
                 <p className="section-kicker">{t.how}</p>
                 <h1 className="mt-2 text-2xl font-black leading-tight text-white md:text-3xl">{t.heroTitle}</h1>
                 <p className="mt-3 text-sm leading-6 text-slate-400">{t.heroText}</p>
+                <p className="hero-use-case">{t.useCase}</p>
               </div>
               <div className="quick-steps">
                 <QuickStep icon={<CircleDollarSign size={18} />} label={t.virtualCredits} />
@@ -395,7 +490,26 @@ export default function EscrowChallengeApp() {
         </div>
       </section>
 
+      <section className="p2p-visual-section" aria-labelledby="p2p-visual-title">
+        <Image
+          src="/escrowbet-p2p-hero.png"
+          alt="Two football supporters using EscrowBet on their phones during a match"
+          fill
+          priority
+          sizes="100vw"
+        />
+        <div className="p2p-visual-scrim" />
+        <div className="p2p-visual-content">
+          <p className="section-kicker">{t.visualKicker}</p>
+          <h2 id="p2p-visual-title">{t.visualTitle}</h2>
+          <p>{t.visualText}</p>
+          <a href="#onchain" className="primary-button">{t.navVault} <ArrowRight size={17} /></a>
+        </div>
+      </section>
+
       {notice && <div className="mx-auto max-w-7xl px-4 pt-4"><div className="app-notice" role="status"><CheckCircle2 size={17} />{notice}</div></div>}
+
+      <EscrowLifecycle t={t} />
 
       <section className="mx-auto max-w-7xl px-4 py-5">
         <div className="wallet-strip">
@@ -410,25 +524,25 @@ export default function EscrowChallengeApp() {
         <section className="mx-auto max-w-7xl px-4 pb-2">
           <div className="shared-challenge">
             <div>
-              <p className="section-kicker">Shared challenge</p>
+              <p className="section-kicker">{t.sharedChallenge}</p>
               <h2 className="mt-2 text-xl font-black text-white">{sharedAgreement.match.homeTeam} vs {sharedAgreement.match.awayTeam}</h2>
-              <p className="mt-2 text-sm text-slate-300">{sharedAgreement.creator.email} invites you to compete for a {sharedAgreement.pot} EscrowCoin pool.</p>
+              <p className="mt-2 text-sm text-slate-300">{sharedAgreement.creator.email} {t.invites} {sharedAgreement.pot} EscrowCoins.</p>
             </div>
-            <button onClick={() => requireAuth(() => document.getElementById('agreements')?.scrollIntoView({ behavior: 'smooth' }))} className="primary-button">View challenge <ChevronRight size={17} /></button>
+            <button onClick={() => requireAuth(() => document.getElementById('agreements')?.scrollIntoView({ behavior: 'smooth' }))} className="primary-button">{t.viewChallenge} <ChevronRight size={17} /></button>
           </div>
         </section>
       )}
 
       <section id="matches" className="mx-auto max-w-7xl px-4 py-7">
         <div className="section-heading">
-          <div><p className="section-kicker">Markets</p><h2 className="section-title">{t.matches}</h2></div>
-          <span className="match-count">{filteredMatches.length} events</span>
+          <div><p className="section-kicker">{t.marketKicker}</p><h2 className="section-title">{t.matches}</h2></div>
+          <span className="match-count">{filteredMatches.length} {t.events}</span>
         </div>
         <div className="search-control mt-4"><Search size={18} /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t.filter} /></div>
         <div className="filter-scroll" aria-label="Match stage filters">
           {[
-            ['all', 'All'], ['group', 'Groups'], ['round32', 'Round of 32'],
-            ['round16', 'Round of 16'], ['quarters', 'Quarterfinals'], ['semis', 'Semifinals'], ['final', 'Final'],
+            ['all', t.all], ['group', t.groups], ['round32', t.round32],
+            ['round16', t.round16], ['quarters', t.quarters], ['semis', t.semis], ['final', t.final],
           ].map(([value, label]) => (
             <button key={value} onClick={() => setStageFilter(value)} className={stageFilter === value ? 'active' : ''}>{label}</button>
           ))}
@@ -437,14 +551,14 @@ export default function EscrowChallengeApp() {
           {filteredMatches.slice(0, 104).map((match) => (
             <button key={match.matchId} onClick={() => requireAuth(() => setSelected(match))} className="market-card text-left">
               <div className="market-meta">
-                <span className="market-stage">{match.groupCode ? `Group ${match.groupCode}` : match.stage || 'World Cup'}</span>
+                <span className="market-stage">{match.groupCode ? `${t.group} ${match.groupCode}` : match.stage || t.match}</span>
                 <span className="flex items-center gap-1"><Clock3 size={12} />{formatKickoff(match.kickoffUtc, locale)}</span>
               </div>
               <div className="market-team"><TeamDot name={match.homeTeam} /><strong>{match.homeTeam}</strong><span>—</span></div>
               <div className="market-team"><TeamDot name={match.awayTeam} /><strong>{match.awayTeam}</strong><span>—</span></div>
               <div className="market-footer">
-                <span className="truncate">{[match.stadium, match.city].filter(Boolean).join(' · ') || 'Venue TBA'}</span>
-                <span className="market-action">Challenge <ChevronRight size={14} /></span>
+                <span className="truncate">{[match.stadium, match.city].filter(Boolean).join(' · ') || t.venueTba}</span>
+                <span className="market-action">{t.challenge} <ChevronRight size={14} /></span>
               </div>
             </button>
           ))}
@@ -453,7 +567,7 @@ export default function EscrowChallengeApp() {
 
       <section id="agreements" className="agreements-band">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-9 lg:grid-cols-2">
-          <AgreementList title={t.open} agreements={openAgreements} empty={t.empty}>
+          <AgreementList title={t.open} agreements={openAgreements} empty={t.empty} labels={t}>
             {(agreement) => (
               <form onSubmit={(event) => acceptAgreement(event, agreement)} className="agreement-action-row">
                 <ScoreFields />
@@ -461,11 +575,11 @@ export default function EscrowChallengeApp() {
               </form>
             )}
           </AgreementList>
-          <AgreementList title={t.mine} agreements={myAgreements} empty={t.empty}>
+          <AgreementList title={t.mine} agreements={myAgreements} empty={t.empty} labels={t}>
             {(agreement) => (
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 {agreement.status === 'awaiting_result' && <button disabled={busy} onClick={() => settle(agreement)} className="primary-button">{t.settle}</button>}
-                {agreement.status === 'open' && <button onClick={() => shareAgreement(agreement)} className="secondary-button"><Share2 size={16} /> Share</button>}
+                {agreement.status === 'open' && <button onClick={() => shareAgreement(agreement)} className="secondary-button"><Share2 size={16} /> {t.share}</button>}
                 {agreement.settlement?.receiptHash && <code className="truncate text-xs text-[#73f7ae]">{t.receipt}: {agreement.settlement.receiptHash}</code>}
               </div>
             )}
@@ -475,7 +589,7 @@ export default function EscrowChallengeApp() {
 
       <section id="leaderboard" className="mx-auto max-w-7xl px-4 py-9">
         <div className="section-heading">
-          <div><p className="section-kicker">Verified settlements</p><h2 className="section-title">{t.leaderboard}</h2></div>
+          <div><p className="section-kicker">{t.verifiedSettlements}</p><h2 className="section-title">{t.leaderboard}</h2></div>
           <Trophy className="text-[#ffad42]" size={26} />
         </div>
         <div className="leaderboard-board">
@@ -484,23 +598,23 @@ export default function EscrowChallengeApp() {
               <strong className={index < 3 ? 'leader-rank top' : 'leader-rank'}>#{index + 1}</strong>
               <div className="user-orb small"><UserRound size={15} /></div>
               <code className="truncate text-sm text-slate-300">{leader._id}</code>
-              <span className="text-sm text-white">{leader.wins} wins</span>
+              <span className="text-sm text-white">{leader.wins} {t.wins}</span>
               <strong className="text-[#73f7ae]">{leader.escrowCoinsWon} EC</strong>
             </div>
           )) : <p className="p-5 text-sm text-slate-400">{t.empty}</p>}
         </div>
       </section>
 
-      <TechnologyReel />
+      <TechnologyReel t={t} />
 
       <div className="disclaimer-band">
         <div className="mx-auto grid max-w-7xl gap-2 px-4 py-5 text-xs text-slate-400 sm:grid-cols-2 lg:grid-cols-4">
-          {DISCLAIMERS.map((item) => <p key={item}><ShieldCheck size={13} />{item}</p>)}
+          {disclaimers.map((item) => <p key={item}><ShieldCheck size={13} />{item}</p>)}
         </div>
       </div>
 
       {selected && (
-        <Modal title={`${selected.homeTeam} vs ${selected.awayTeam}`} onClose={() => setSelected(null)}>
+        <Modal title={`${selected.homeTeam} vs ${selected.awayTeam}`} closeLabel={t.close} onClose={() => setSelected(null)}>
           <form onSubmit={createAgreement} className="challenge-form">
             <div className="sheet-match-summary"><TeamCrest name={selected.homeTeam} compact /><span>VS</span><TeamCrest name={selected.awayTeam} compact /></div>
             <div className="form-section">
@@ -520,7 +634,7 @@ export default function EscrowChallengeApp() {
       )}
 
       {authOpen && (
-        <Modal title={authMode === 'login' ? t.signIn : t.register} onClose={() => setAuthOpen(false)}>
+        <Modal title={authMode === 'login' ? t.signIn : t.register} closeLabel={t.close} onClose={() => setAuthOpen(false)}>
           <form onSubmit={handleAuth} className="space-y-4">
             <a href={`${API_URL}/api/auth/google?source=escrow-challenge`} className="social-button bg-white text-slate-950"><strong>G</strong> {t.continueGoogle}</a>
             {process.env.NEXT_PUBLIC_APPLE_AUTH_ENABLED === 'true' && (
@@ -536,7 +650,7 @@ export default function EscrowChallengeApp() {
       )}
 
       {qrOpen && (
-        <Modal title={t.openPhone} onClose={() => setQrOpen(false)}>
+        <Modal title={t.openPhone} closeLabel={t.close} onClose={() => setQrOpen(false)}>
           <div className="text-center">
             {qrDataUrl && <Image src={qrDataUrl} width={280} height={280} unoptimized alt="QR code to open EscrowBet.cool" className="mx-auto w-full max-w-[280px] rounded-md bg-white p-3" />}
             <p className="mt-4 text-sm leading-6 text-slate-300">{t.scanQr}</p>
@@ -544,37 +658,75 @@ export default function EscrowChallengeApp() {
         </Modal>
       )}
 
-      <MobileNav onQr={() => setQrOpen(true)} />
+      <MobileNav t={t} onQr={() => setQrOpen(true)} />
     </div>
   );
 }
 
-function MobileNav({ onQr }: { onQr: () => void }) {
+function EscrowLifecycle({ t }: { t: Record<string, string> }) {
+  const steps = [
+    { icon: <UserRound />, title: t.stepAgree, text: t.stepAgreeText },
+    { icon: <LockKeyhole />, title: t.stepLock, text: t.stepLockText },
+    { icon: <ShieldCheck />, title: t.stepVerify, text: t.stepVerifyText },
+    { icon: <FileCheck2 />, title: t.stepSettle, text: t.stepSettleText },
+  ];
+
+  return (
+    <section className="escrow-lifecycle">
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <div className="lifecycle-heading">
+          <div>
+            <p className="section-kicker">{t.flowKicker}</p>
+            <h2 className="section-title">{t.flowTitle}</h2>
+            <p>{t.flowText}</p>
+          </div>
+          <div className="lifecycle-proof">
+            <span><CheckCircle2 size={14} />{t.reusable}</span>
+            <span><CheckCircle2 size={14} />{t.demoLayer}</span>
+          </div>
+        </div>
+        <div className="lifecycle-grid">
+          {steps.map((step, index) => (
+            <article className="lifecycle-step" key={step.title}>
+              <div className="lifecycle-step-top">
+                <span>{step.icon}</span>
+                <strong>0{index + 1}</strong>
+              </div>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MobileNav({ onQr, t }: { onQr: () => void; t: Record<string, string> }) {
   return (
     <nav className="mobile-app-nav">
-      <a href="#matches"><CalendarDays /><small>Matches</small></a>
-      <a href="#onchain"><WalletCards /><small>Vault</small></a>
-      <a href="#agreements"><ShieldCheck /><small>Challenges</small></a>
-      <a href="#leaderboard"><Trophy /><small>Ranking</small></a>
-      <button onClick={onQr}><QrCode /><small>QR</small></button>
+      <a href="#matches"><CalendarDays /><small>{t.navMatches}</small></a>
+      <a href="#onchain"><WalletCards /><small>{t.navVault}</small></a>
+      <a href="#agreements"><ShieldCheck /><small>{t.navChallenges}</small></a>
+      <a href="#leaderboard"><Trophy /><small>{t.navRanking}</small></a>
+      <button onClick={onQr}><QrCode /><small>{t.navQr}</small></button>
     </nav>
   );
 }
 
-const TECHNOLOGY_REEL = [
-  { number: '01', title: 'Conditional Escrow', text: 'Lock virtual credits until verifiable conditions are completed.', accent: 'green', icon: <LockKeyhole /> },
-  { number: '02', title: 'Evidence Layer', text: 'Preserve structured evidence and its integrity with hashes.', accent: 'blue', icon: <ShieldCheck /> },
-  { number: '03', title: 'Programmable Agreements', text: 'Translate commitments into traceable execution workflows.', accent: 'orange', icon: <CircleDollarSign /> },
-  { number: '04', title: 'Verifiable Receipts', text: 'Generate final proof for every conditional settlement.', accent: 'purple', icon: <FileCheck2 /> },
-] as const;
-
-function TechnologyReel() {
-  const reel = [...TECHNOLOGY_REEL, ...TECHNOLOGY_REEL];
+function TechnologyReel({ t }: { t: Record<string, string> }) {
+  const technology = [
+    { number: '01', title: t.tech1Title, text: t.tech1Text, accent: 'green', icon: <LockKeyhole /> },
+    { number: '02', title: t.tech2Title, text: t.tech2Text, accent: 'blue', icon: <ShieldCheck /> },
+    { number: '03', title: t.tech3Title, text: t.tech3Text, accent: 'orange', icon: <CircleDollarSign /> },
+    { number: '04', title: t.tech4Title, text: t.tech4Text, accent: 'purple', icon: <FileCheck2 /> },
+  ];
+  const reel = [...technology, ...technology];
   return (
     <section className="technology-reel-section py-9">
       <div className="mx-auto mb-5 flex max-w-7xl items-end justify-between gap-4 px-4">
-        <div><p className="section-kicker">UDoChain technology</p><h2 className="section-title">Protocol intelligence</h2></div>
-        <span className="hidden font-mono text-xs text-slate-500 sm:block">TECH REEL 01—04</span>
+        <div><p className="section-kicker">{t.techKicker}</p><h2 className="section-title">{t.techTitle}</h2></div>
+        <span className="hidden font-mono text-xs text-slate-500 sm:block">PROTOCOL 01—04</span>
       </div>
       <div className="technology-reel overflow-hidden">
         <div className="technology-reel-track">
@@ -631,7 +783,7 @@ function WalletStat({ icon, label, value, accent }: { icon: ReactNode; label: st
   );
 }
 
-function AgreementList({ title, agreements, empty, children }: { title: string; agreements: Agreement[]; empty: string; children: (agreement: Agreement) => ReactNode }) {
+function AgreementList({ title, agreements, empty, labels, children }: { title: string; agreements: Agreement[]; empty: string; labels: Record<string, string>; children: (agreement: Agreement) => ReactNode }) {
   return (
     <div>
       <div className="section-heading"><h2 className="section-title">{title}</h2><span className="match-count">{agreements.length}</span></div>
@@ -647,9 +799,9 @@ function AgreementList({ title, agreements, empty, children }: { title: string; 
               <span className="status-chip">{agreement.status.replace('_', ' ')}</span>
             </div>
             <div className="agreement-numbers">
-              <div><span>Prediction</span><strong>{agreement.creator.prediction.homeScore}:{agreement.creator.prediction.awayScore}</strong></div>
-              <div><span>Stake</span><strong>{agreement.stakePerPlayer} EC</strong></div>
-              <div><span>Pool</span><strong>{agreement.pot} EC</strong></div>
+              <div><span>{labels.predictionLabel}</span><strong>{agreement.creator.prediction.homeScore}:{agreement.creator.prediction.awayScore}</strong></div>
+              <div><span>{labels.stakeLabel}</span><strong>{agreement.stakePerPlayer} EC</strong></div>
+              <div><span>{labels.poolLabel}</span><strong>{agreement.pot} EC</strong></div>
             </div>
             {children(agreement)}
           </article>
@@ -659,12 +811,12 @@ function AgreementList({ title, agreements, empty, children }: { title: string; 
   );
 }
 
-function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+function Modal({ title, closeLabel, onClose, children }: { title: string; closeLabel: string; onClose: () => void; children: ReactNode }) {
   return (
     <div className="modal-scrim" onMouseDown={onClose}>
       <div className="app-sheet" onMouseDown={(event) => event.stopPropagation()}>
         <div className="sheet-handle" />
-        <div className="sheet-header"><h2>{title}</h2><button onClick={onClose} aria-label="Close"><X size={21} /></button></div>
+        <div className="sheet-header"><h2>{title}</h2><button onClick={onClose} aria-label={closeLabel}><X size={21} /></button></div>
         {children}
       </div>
     </div>
