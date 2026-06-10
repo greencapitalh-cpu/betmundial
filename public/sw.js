@@ -1,4 +1,4 @@
-const CACHE_NAME = 'escrowbet-v4';
+const CACHE_NAME = 'escrowbet-v5';
 const APP_SHELL = ['/', '/manifest.json', '/icons/icon.svg', '/world-cup-abstract-bg.png'];
 
 self.addEventListener('install', (event) => {

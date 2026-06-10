@@ -6,7 +6,7 @@ import Image from 'next/image';
 import OnChainWalletPanel from './OnChainWalletPanel';
 import {
   ArrowRight, CalendarDays, CheckCircle2, ChevronRight, CircleDollarSign,
-  Clock3, FileCheck2, LockKeyhole, MapPin, QrCode, Search, Share2,
+  Clock3, FileCheck2, LockKeyhole, MapPin, Pause, Play, QrCode, Search, Share2,
   ShieldCheck, Trophy, UserRound, WalletCards, X,
 } from 'lucide-react';
 import { useLocale, type Locale } from './LocaleProvider';
@@ -69,6 +69,14 @@ const copy: Record<Locale, Record<string, string>> = {
     tech2Title: 'Evidence Layer', tech2Text: 'Preserve structured evidence and its integrity through cryptographic hashes.',
     tech3Title: 'Programmable Agreements', tech3Text: 'Turn peer commitments into traceable execution workflows.',
     tech4Title: 'Verifiable Receipts', tech4Text: 'Produce final proof for every conditional settlement.',
+    reelEyebrow: 'Technology partner spotlight', reelTitle: 'Behind the trust layer',
+    reelSponsor: 'Technology partner message',
+    reel1Title: 'Digital Trust Infrastructure', reel1Text: 'A neutral foundation for trusted operations across organizations, systems and jurisdictions.',
+    reel2Title: 'Verifiable Evidence', reel2Text: 'Create auditable evidence trails with integrity, provenance and controlled access.',
+    reel3Title: 'Dispute Resolution', reel3Text: 'Give legal and compliance teams a shared, traceable record for faster resolution.',
+    reel4Title: 'Smart Traceability', reel4Text: 'Connect operational events from origin to outcome across complex enterprise workflows.',
+    reel5Title: 'Real World Assets (RWA)', reel5Text: 'Link physical assets, documents and business events to verifiable digital records.',
+    reelScene: 'Scene', reelPause: 'Pause reel', reelPlay: 'Play reel',
     disclaimer1: 'No real money.', disclaimer2: 'EscrowCoins are virtual credits.',
     disclaimer3: 'This is a technology demo for conditional escrow.', disclaimer4: 'UDoChain does not operate betting or gambling.',
   },
@@ -111,6 +119,14 @@ const copy: Record<Locale, Record<string, string>> = {
     tech2Title: 'Capa de evidencia', tech2Text: 'Preserva evidencia estructurada y su integridad mediante hashes criptográficos.',
     tech3Title: 'Acuerdos programables', tech3Text: 'Convierte compromisos entre personas en flujos de ejecución trazables.',
     tech4Title: 'Recibos verificables', tech4Text: 'Genera una prueba final para cada liquidación condicional.',
+    reelEyebrow: 'Espacio del socio tecnológico', reelTitle: 'Detrás de la capa de confianza',
+    reelSponsor: 'Mensaje del socio tecnológico',
+    reel1Title: 'Infraestructura de confianza digital', reel1Text: 'Una base neutral para operaciones confiables entre empresas, sistemas y jurisdicciones.',
+    reel2Title: 'Evidencia verificable', reel2Text: 'Crea trazas de evidencia auditables con integridad, procedencia y acceso controlado.',
+    reel3Title: 'Resolución de disputas', reel3Text: 'Ofrece a equipos legales y de compliance un registro compartido y trazable para resolver más rápido.',
+    reel4Title: 'Trazabilidad inteligente', reel4Text: 'Conecta eventos operativos desde su origen hasta el resultado en flujos empresariales complejos.',
+    reel5Title: 'Activos del mundo real (RWA)', reel5Text: 'Vincula activos físicos, documentos y eventos de negocio con registros digitales verificables.',
+    reelScene: 'Escena', reelPause: 'Pausar reel', reelPlay: 'Reproducir reel',
     disclaimer1: 'No utiliza dinero real.', disclaimer2: 'Los EscrowCoins son créditos virtuales.',
     disclaimer3: 'Esta es una demo tecnológica de escrow condicional.', disclaimer4: 'UDoChain no opera apuestas ni juegos de azar.',
   },
@@ -153,6 +169,14 @@ const copy: Record<Locale, Record<string, string>> = {
     tech2Title: 'Camada de evidência', tech2Text: 'Preserva evidências estruturadas e sua integridade por meio de hashes criptográficos.',
     tech3Title: 'Acordos programáveis', tech3Text: 'Transforma compromissos entre pessoas em fluxos de execução rastreáveis.',
     tech4Title: 'Recibos verificáveis', tech4Text: 'Produz uma prova final para cada liquidação condicional.',
+    reelEyebrow: 'Espaço do parceiro tecnológico', reelTitle: 'Por trás da camada de confiança',
+    reelSponsor: 'Mensagem do parceiro tecnológico',
+    reel1Title: 'Infraestrutura de confiança digital', reel1Text: 'Uma base neutra para operações confiáveis entre empresas, sistemas e jurisdições.',
+    reel2Title: 'Evidência verificável', reel2Text: 'Cria trilhas de evidência auditáveis com integridade, procedência e acesso controlado.',
+    reel3Title: 'Resolução de disputas', reel3Text: 'Oferece às equipes jurídicas e de compliance um registro compartilhado e rastreável para decisões mais rápidas.',
+    reel4Title: 'Rastreabilidade inteligente', reel4Text: 'Conecta eventos operacionais da origem ao resultado em fluxos empresariais complexos.',
+    reel5Title: 'Ativos do mundo real (RWA)', reel5Text: 'Vincula ativos físicos, documentos e eventos de negócio a registros digitais verificáveis.',
+    reelScene: 'Cena', reelPause: 'Pausar reel', reelPlay: 'Reproduzir reel',
     disclaimer1: 'Não utiliza dinheiro real.', disclaimer2: 'EscrowCoins são créditos virtuais.',
     disclaimer3: 'Esta é uma demo tecnológica de escrow condicional.', disclaimer4: 'A UDoChain não opera apostas nem jogos de azar.',
   },
@@ -195,6 +219,14 @@ const copy: Record<Locale, Record<string, string>> = {
     tech2Title: 'Couche de preuve', tech2Text: 'Préserve les preuves structurées et leur intégrité grâce aux empreintes cryptographiques.',
     tech3Title: 'Accords programmables', tech3Text: 'Transforme les engagements entre personnes en workflows d’exécution traçables.',
     tech4Title: 'Reçus vérifiables', tech4Text: 'Produit une preuve finale pour chaque règlement conditionnel.',
+    reelEyebrow: 'Espace du partenaire technologique', reelTitle: 'Derrière la couche de confiance',
+    reelSponsor: 'Message du partenaire technologique',
+    reel1Title: 'Infrastructure de confiance numérique', reel1Text: 'Une base neutre pour des opérations fiables entre entreprises, systèmes et juridictions.',
+    reel2Title: 'Preuve vérifiable', reel2Text: 'Crée des pistes de preuve auditables avec intégrité, provenance et accès contrôlé.',
+    reel3Title: 'Résolution des litiges', reel3Text: 'Fournit aux équipes juridiques et conformité un dossier partagé et traçable pour décider plus vite.',
+    reel4Title: 'Traçabilité intelligente', reel4Text: 'Relie les événements opérationnels de leur origine à leur résultat dans des workflows complexes.',
+    reel5Title: 'Actifs du monde réel (RWA)', reel5Text: 'Relie les actifs physiques, documents et événements métier à des registres numériques vérifiables.',
+    reelScene: 'Scène', reelPause: 'Mettre le reel en pause', reelPlay: 'Lire le reel',
     disclaimer1: 'Aucun argent réel.', disclaimer2: 'Les EscrowCoins sont des crédits virtuels.',
     disclaimer3: 'Ceci est une démo technologique d’escrow conditionnel.', disclaimer4: 'UDoChain n’opère ni paris ni jeux d’argent.',
   },
@@ -715,33 +747,83 @@ function MobileNav({ onQr, t }: { onQr: () => void; t: Record<string, string> })
 }
 
 function TechnologyReel({ t }: { t: Record<string, string> }) {
-  const technology = [
-    { number: '01', title: t.tech1Title, text: t.tech1Text, accent: 'green', icon: <LockKeyhole /> },
-    { number: '02', title: t.tech2Title, text: t.tech2Text, accent: 'blue', icon: <ShieldCheck /> },
-    { number: '03', title: t.tech3Title, text: t.tech3Text, accent: 'orange', icon: <CircleDollarSign /> },
-    { number: '04', title: t.tech4Title, text: t.tech4Text, accent: 'purple', icon: <FileCheck2 /> },
+  const [activeScene, setActiveScene] = useState(0);
+  const [playing, setPlaying] = useState(true);
+  const scenes = [
+    { image: '/udochain-reel-digital-trust.png', title: t.reel1Title, text: t.reel1Text },
+    { image: '/udochain-reel-evidence.png', title: t.reel2Title, text: t.reel2Text },
+    { image: '/udochain-reel-disputes.png', title: t.reel3Title, text: t.reel3Text },
+    { image: '/udochain-reel-traceability.png', title: t.reel4Title, text: t.reel4Text },
+    { image: '/udochain-reel-rwa.png', title: t.reel5Title, text: t.reel5Text },
   ];
-  const reel = [...technology, ...technology];
+
+  useEffect(() => {
+    if (!playing) return;
+    const timer = window.setInterval(() => setActiveScene((scene) => (scene + 1) % scenes.length), 4000);
+    return () => window.clearInterval(timer);
+  }, [playing, scenes.length]);
+
   return (
-    <section className="technology-reel-section py-9">
-      <div className="mx-auto mb-5 flex max-w-7xl items-end justify-between gap-4 px-4">
-        <div><p className="section-kicker">{t.techKicker}</p><h2 className="section-title">{t.techTitle}</h2></div>
-        <span className="hidden font-mono text-xs text-slate-500 sm:block">PROTOCOL 01—04</span>
+    <section className="enterprise-reel-section">
+      <div className="enterprise-reel-heading">
+        <div>
+          <span className="reel-sponsor-label">{t.reelSponsor}</span>
+          <p className="section-kicker">{t.reelEyebrow}</p>
+          <h2 className="section-title">{t.reelTitle}</h2>
+        </div>
+        <button
+          type="button"
+          className="reel-play-control"
+          aria-label={playing ? t.reelPause : t.reelPlay}
+          onClick={() => setPlaying((value) => !value)}
+        >
+          {playing ? <Pause size={17} /> : <Play size={17} />}
+        </button>
       </div>
-      <div className="technology-reel overflow-hidden">
-        <div className="technology-reel-track">
-          {reel.map((item, index) => (
-            <article key={`${item.number}-${index}`} className={`technology-slide technology-slide-${item.accent}`}>
-              <div className="technology-slide-head"><span>{item.icon}</span><strong>{item.number}</strong></div>
-              <div className="mt-auto">
-                <h3 className="text-xl font-black text-white">{item.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-300">{item.text}</p>
-                <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.16em] text-slate-500">Powered by UDoChain</p>
-              </div>
-            </article>
+
+      <div className="enterprise-reel" aria-live="polite">
+        {scenes.map((scene, index) => (
+          <article key={scene.image} className={`enterprise-scene ${activeScene === index ? 'active' : ''}`}>
+            <Image
+              src={scene.image}
+              alt=""
+              fill
+              priority={index === 0}
+              loading={index === 0 ? 'eager' : 'lazy'}
+              sizes="(max-width: 767px) 100vw, 540px"
+            />
+            <div className="enterprise-scene-scrim" />
+            <div className="enterprise-scene-copy">
+              <span>{String(index + 1).padStart(2, '0')} / 05</span>
+              <h3>{scene.title}</h3>
+              <p>{scene.text}</p>
+            </div>
+            <div className="udochain-reel-brand">
+              <Image src="/udochain-logo.png" alt="" width={28} height={28} />
+              <strong>udochain.com</strong>
+            </div>
+          </article>
+        ))}
+
+        <div className="enterprise-reel-nav">
+          {scenes.map((scene, index) => (
+            <button
+              type="button"
+              key={scene.image}
+              className={activeScene === index ? 'active' : ''}
+              aria-label={`${t.reelScene} ${index + 1}: ${scene.title}`}
+              onClick={() => {
+                setActiveScene(index);
+                setPlaying(false);
+              }}
+            >
+              <span />
+              <strong>{String(index + 1).padStart(2, '0')}</strong>
+            </button>
           ))}
         </div>
       </div>
+
     </section>
   );
 }
